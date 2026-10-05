@@ -8,6 +8,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import config_by_name
 import os
+import logging
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -16,39 +17,43 @@ csrf = CSRFProtect()
 mail = Mail()
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
+_log = logging.getLogger("bamstudio")
+
 
 def create_app(config_name=None):
+    """Application factory. Returns a Flask instance (never the `app` package)."""
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(config_by_name.get(config_name, config_by_name["default"]))
 
-    # Vercel / serverless: /var/task is read-only. Flask-SQLAlchemy calls
-    # os.makedirs(app.instance_path) during init_app, which fails with
-    # OSError: [Errno 30] Read-only file system. Point instance_path at /tmp.
+    # IMPORTANT: variable must NOT be named `app` — that collides with this package
+    # name on some import paths and caused: AttributeError: module 'app' has no attribute 'config'
+    flask_app = Flask(__name__, instance_relative_config=True)
+    flask_app.config.from_object(
+        config_by_name.get(config_name, config_by_name["default"])
+    )
+
+    # Vercel / serverless: /var/task is read-only
     if os.environ.get("VERCEL") or not os.access(
-        os.path.dirname(app.instance_path) or app.instance_path, os.W_OK
+        os.path.dirname(flask_app.instance_path) or flask_app.instance_path, os.W_OK
     ):
-        app.instance_path = "/tmp/instance"
+        flask_app.instance_path = "/tmp/instance"
         try:
-            os.makedirs(app.instance_path, exist_ok=True)
+            os.makedirs(flask_app.instance_path, exist_ok=True)
         except OSError:
             pass
 
-    # Init extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
-    login_manager.init_app(app)
-    csrf.init_app(app)
+    db.init_app(flask_app)
+    migrate.init_app(flask_app, db)
+    login_manager.init_app(flask_app)
+    csrf.init_app(flask_app)
 
-    # Ensure session exists so CSRF token can be stored (fixes "CSRF session token is missing")
-    @app.before_request
+    @flask_app.before_request
     def _ensure_session():
-        from flask import session
         session.permanent = True
         session.setdefault("_csrf_ready", True)
-    mail.init_app(app)
-    limiter.init_app(app)
+
+    mail.init_app(flask_app)
+    limiter.init_app(flask_app)
 
     login_manager.login_view = "admin_auth.login"
     login_manager.login_message_category = "warning"
@@ -62,17 +67,15 @@ def create_app(config_name=None):
         except Exception:
             return None
 
-    # Language handling
-    @app.before_request
+    @flask_app.before_request
     def set_language():
         lang = request.args.get("lang") or request.cookies.get("lang") or session.get("lang")
         if lang not in ("en", "ne"):
-            lang = app.config.get("DEFAULT_LANGUAGE", "en")
+            lang = flask_app.config.get("DEFAULT_LANGUAGE", "en")
         g.lang = lang
         session["lang"] = lang
 
-    # Context processors — resilient if tables are missing / DB is empty
-    @app.context_processor
+    @flask_app.context_processor
     def inject_globals():
         lang = getattr(g, "lang", "en")
         nav_items = []
@@ -110,18 +113,16 @@ def create_app(config_name=None):
             "site_tagline": site_tagline,
         }
 
-    # Register blueprints
     from app.routes.public import public_bp
     from app.routes.admin_auth import admin_auth_bp
     from app.routes.admin import admin_bp
     from app.routes.api import api_bp
 
-    app.register_blueprint(public_bp)
-    app.register_blueprint(admin_auth_bp, url_prefix="/admin")
-    app.register_blueprint(admin_bp, url_prefix="/admin")
-    app.register_blueprint(api_bp, url_prefix="/api")
+    flask_app.register_blueprint(public_bp)
+    flask_app.register_blueprint(admin_auth_bp, url_prefix="/admin")
+    flask_app.register_blueprint(admin_bp, url_prefix="/admin")
+    flask_app.register_blueprint(api_bp, url_prefix="/api")
 
-    # Error handlers with plain-HTML fallback (avoids TemplateNotFound cascades)
     def _plain_error(code, title, message):
         html = (
             f"<!DOCTYPE html><html><head><meta charset=utf-8>"
@@ -135,15 +136,15 @@ def create_app(config_name=None):
         )
         return html, code
 
-    @app.errorhandler(404)
+    @flask_app.errorhandler(404)
     def not_found(e):
         try:
             from flask import render_template
             return render_template("public/errors/404.html"), 404
         except Exception:
-            return _plain_error(404, "Page not found", "The page you\'re looking for doesn\'t exist.")
+            return _plain_error(404, "Page not found", "The page does not exist.")
 
-    @app.errorhandler(403)
+    @flask_app.errorhandler(403)
     def forbidden(e):
         try:
             from flask import render_template
@@ -151,7 +152,7 @@ def create_app(config_name=None):
         except Exception:
             return _plain_error(403, "Forbidden", "You do not have access to this page.")
 
-    @app.errorhandler(500)
+    @flask_app.errorhandler(500)
     def server_error(e):
         try:
             from flask import render_template
@@ -159,8 +160,7 @@ def create_app(config_name=None):
         except Exception:
             return _plain_error(500, "Something went wrong", "Please try again later.")
 
-    # Security headers
-    @app.after_request
+    @flask_app.after_request
     def set_security_headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
@@ -168,12 +168,15 @@ def create_app(config_name=None):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         return response
 
-    # Auto-create tables + seed if missing (needed on Vercel / first deploy).
-    # Must never raise — concurrent cold starts can race on unique constraints.
-    with app.app_context():
+    # Lightweight health check (no DB) for debugging deploys
+    @flask_app.route("/health")
+    def health():
+        return {"status": "ok"}, 200
+
+    # Auto-create tables + seed (never crash import)
+    with flask_app.app_context():
         try:
-            import logging
-            import app.models  # noqa: F401 — register models on metadata
+            import app.models  # noqa: F401
             db.create_all()
             from app.models import Service
             from sqlalchemy.exc import IntegrityError
@@ -189,21 +192,15 @@ def create_app(config_name=None):
                     from app.services.seed import run_seed
                     run_seed()
                 except IntegrityError:
-                    # Another concurrent instance already seeded
                     db.session.rollback()
                 except Exception as seed_exc:
                     db.session.rollback()
-                    logging.getLogger("bamstudio").warning(
-                        "DB seed skipped or failed: %s", seed_exc
-                    )
+                    _log.warning("DB seed skipped or failed: %s", seed_exc)
         except Exception as exc:
             try:
                 db.session.rollback()
             except Exception:
                 pass
-            import logging
-            logging.getLogger("bamstudio").warning(
-                "DB init skipped or failed: %s", exc
-            )
+            _log.warning("DB init skipped or failed: %s", exc)
 
-    return app
+    return flask_app

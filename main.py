@@ -1,4 +1,4 @@
-"""Vercel entrypoint — WSGI `app` + visible errors for debugging."""
+"""Vercel entrypoint — exports WSGI callable `app`."""
 import os
 import sys
 import traceback
@@ -17,7 +17,13 @@ _flask_app = create_app(
     or ("production" if os.environ.get("VERCEL") else "development")
 )
 
-# Surface real errors while stabilizing deploy
+# Guard against package/name collision returning the module instead of Flask
+if not hasattr(_flask_app, "config"):
+    raise RuntimeError(
+        f"create_app() returned {type(_flask_app)!r}, expected Flask app. "
+        "Package name collision with `app`."
+    )
+
 _flask_app.config["PROPAGATE_EXCEPTIONS"] = True
 
 
@@ -30,10 +36,8 @@ def app(environ, start_response):
         sys.stderr.flush()
         body = (
             b"<!DOCTYPE html><html><head><meta charset=utf-8><title>500</title></head>"
-            b"<body style='font-family:ui-monospace,monospace;background:#0a0a0a;color:#e8e8e8;padding:24px'>"
-            b"<h1 style='color:#f66'>500 Internal Server Error</h1>"
-            b"<p>Copy this traceback and send it for a fix:</p>"
-            b"<pre style='white-space:pre-wrap;font-size:12px;background:#111;padding:16px;border:1px solid #333;border-radius:8px'>"
+            b"<body style='font-family:monospace;background:#0a0a0a;color:#eee;padding:24px'>"
+            b"<h1 style='color:#f66'>500</h1><pre style='white-space:pre-wrap;font-size:12px'>"
             + tb.encode("utf-8", errors="replace")
             + b"</pre></body></html>"
         )
