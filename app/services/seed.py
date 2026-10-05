@@ -380,6 +380,26 @@ def seed_tech():
         if not TechItem.query.filter_by(name=name).first():
             db.session.add(TechItem(name=name, display_order=i, is_active=True))
     db.session.commit()
+    dedupe_tech_items()
+
+
+def dedupe_tech_items():
+    """Remove duplicate TechItem rows (same name), keep lowest id."""
+    from sqlalchemy import func
+    try:
+        names = (
+            db.session.query(TechItem.name)
+            .group_by(TechItem.name)
+            .having(func.count(TechItem.id) > 1)
+            .all()
+        )
+        for (name,) in names:
+            rows = TechItem.query.filter_by(name=name).order_by(TechItem.id).all()
+            for extra in rows[1:]:
+                db.session.delete(extra)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def seed_stats():

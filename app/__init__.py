@@ -92,10 +92,10 @@ def create_app(config_name=None):
             else "डिजिटल अनुभव। ईन्जिनियर गरिएको।"
         )
 
-        def safe_get_setting(key, default=""):
+        def safe_get_setting(key, default="", lang=None, **kwargs):
             try:
                 from app.utils.helpers import get_setting
-                return get_setting(key, default)
+                return get_setting(key, default, lang=lang)
             except Exception:
                 return default
 
@@ -223,6 +223,12 @@ def create_app(config_name=None):
                 except Exception as seed_exc:
                     db.session.rollback()
                     _log.warning("DB seed skipped or failed: %s", seed_exc)
+            # Always clean duplicate tech chips from concurrent seeds
+            try:
+                from app.services.seed import dedupe_tech_items
+                dedupe_tech_items()
+            except Exception:
+                pass
         except Exception as exc:
             try:
                 db.session.rollback()
