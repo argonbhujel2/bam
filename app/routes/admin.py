@@ -675,7 +675,19 @@ def users():
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        flash("User created.", "success")
+        try:
+            from app.utils.email import send_admin_credentials
+            from flask import url_for as _url_for
+            login_url = _url_for("admin_auth.login", _external=True)
+            sent = send_admin_credentials(
+                user.email, user.full_name, user.username, password, login_url, is_reset=False
+            )
+            if sent:
+                flash("User created. Login details emailed to " + user.email + ".", "success")
+            else:
+                flash("User created. Email not sent (check MAIL_* settings).", "warning")
+        except Exception as e:
+            flash(f"User created. Email failed: {e}", "warning")
         return redirect(url_for("admin.users"))
     users_list = AdminUser.query.order_by(AdminUser.created_at.desc()).all()
     roles = Role.query.all()
@@ -694,6 +706,35 @@ def user_toggle(id):
     user.is_active = not user.is_active
     db.session.commit()
     flash("User updated.", "success")
+    return redirect(url_for("admin.users"))
+
+
+@admin_bp.route("/users/<int:id>/reset-password", methods=["POST"])
+@admin_required
+def user_reset_password(id):
+    """Generate a temporary password, set it, and email the user."""
+    if not current_user.has_role("Super Admin"):
+        abort(403)
+    import secrets
+    import string
+    user = AdminUser.query.get_or_404(id)
+    alphabet = string.ascii_letters + string.digits
+    temp = "".join(secrets.choice(alphabet) for _ in range(12))
+    user.set_password(temp)
+    db.session.commit()
+    try:
+        from app.utils.email import send_admin_credentials
+        login_url = url_for("admin_auth.login", _external=True)
+        sent = send_admin_credentials(
+            user.email, user.full_name, user.username, temp, login_url, is_reset=True
+        )
+        if sent:
+            flash(f"Password reset. New temporary password emailed to {user.email}.", "success")
+        else:
+            flash(f"Password reset to: {temp} (email not sent — copy this password).", "warning")
+    except Exception as e:
+        flash(f"Password reset to: {temp}. Email failed: {e}", "warning")
+    log_audit("password_reset", "admin_user", user.id, user.username)
     return redirect(url_for("admin.users"))
 
 
@@ -886,7 +927,18 @@ def team_members():
                     u.set_password(password)
                     db.session.add(u)
                     log_audit("created", "admin_user", None, username)
-                    flash(f"Team member + login created ({username}).", "success")
+                    try:
+                        from app.utils.email import send_admin_credentials
+                        login_url = url_for("admin_auth.login", _external=True)
+                        sent = send_admin_credentials(
+                            email, name, username, password, login_url, is_reset=False
+                        )
+                        if sent:
+                            flash(f"Team member + login created ({username}). Credentials emailed to {email}.", "success")
+                        else:
+                            flash(f"Team member + login created ({username}). Email not sent (check MAIL_*).", "warning")
+                    except Exception as e:
+                        flash(f"Team member + login created ({username}). Email failed: {e}", "warning")
                 else:
                     flash("Team member added. Login email/username already exists.", "error")
             else:

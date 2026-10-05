@@ -346,3 +346,44 @@ def notify_status_update(kind, name, email, old_status, new_status, extra=""):
     html = _brand_html(title, intro, rows, "If you have questions, reply to this email.")
     text = _plain_from_rows(title, rows)
     return send_notification(subject, text, html, recipients=[email])
+
+
+
+def send_admin_credentials(to_email, full_name, username, password, login_url, is_reset=False):
+    """Email login credentials to a new or reset admin user."""
+    if not to_email:
+        return False
+    name = full_name or username or "there"
+    if is_reset:
+        title = "Your password was reset"
+        intro = (
+            f"Hi {name}, an administrator reset your BAM Studio admin password. "
+            "Use the new temporary password below to sign in, then change it if you wish."
+        )
+        subject = "[BAM Studio] Admin password reset"
+    else:
+        title = "Your BAM Studio admin account"
+        intro = (
+            f"Hi {name}, an administrator created an admin account for you on BAM Studio. "
+            "Use the credentials below to sign in."
+        )
+        subject = "[BAM Studio] Your admin login"
+    rows = [
+        ("Login URL", login_url),
+        ("Username", username),
+        ("Email", to_email),
+        ("Password", password),
+    ]
+    html = _brand_html(
+        title,
+        intro,
+        rows,
+        "Keep this email private. Do not share your password.",
+    )
+    text_body = _plain_from_rows(title, rows)
+    return send_notification(
+        subject,
+        text_body,
+        html,
+        recipients=[to_email],
+    )
