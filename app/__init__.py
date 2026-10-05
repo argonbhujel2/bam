@@ -27,7 +27,13 @@ def create_app(config_name=None):
 
     # IMPORTANT: variable must NOT be named `app` — that collides with this package
     # name on some import paths and caused: AttributeError: module 'app' has no attribute 'config'
-    flask_app = Flask(__name__, instance_relative_config=True)
+    _pkg_dir = os.path.dirname(os.path.abspath(__file__))
+    flask_app = Flask(
+        __name__,
+        instance_relative_config=True,
+        template_folder=os.path.join(_pkg_dir, "templates"),
+        static_folder=os.path.join(_pkg_dir, "static"),
+    )
     flask_app.config.from_object(
         config_by_name.get(config_name, config_by_name["default"])
     )
