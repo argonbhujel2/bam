@@ -179,6 +179,27 @@ def create_app(config_name=None):
     def health():
         return {"status": "ok"}, 200
 
+    @flask_app.route("/debug-paths")
+    def debug_paths():
+        import os
+        from pathlib import Path
+        tpl = Path(flask_app.template_folder or "")
+        st = Path(flask_app.static_folder or "")
+        return {
+            "template_folder": str(tpl),
+            "template_exists": tpl.exists(),
+            "home_html": str(tpl / "public" / "home.html"),
+            "home_html_exists": (tpl / "public" / "home.html").exists(),
+            "static_folder": str(st),
+            "static_exists": st.exists(),
+            "pkg_dir": str(Path(__file__).resolve().parent),
+            "cwd": os.getcwd(),
+            "listdir_pkg": sorted(os.listdir(Path(__file__).resolve().parent))[:50],
+            "listdir_templates": (
+                sorted(os.listdir(tpl)) if tpl.exists() else "MISSING"
+            ),
+        }
+
     # Auto-create tables + seed (never crash import)
     with flask_app.app_context():
         try:
