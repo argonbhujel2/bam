@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block header %}Analytics{% endblock %}
+{% block content %}
+<div class="stats-grid">
+<div class="stat-card"><div class="label">Total Inquiries</div><div class="value">{{ data.total_inquiries }}</div></div>
+<div class="stat-card"><div class="label">Applications</div><div class="value">{{ data.total_applications }}</div></div>
+<div class="stat-card"><div class="label">Projects</div><div class="value">{{ data.total_projects }}</div></div>
+<div class="stat-card"><div class="label">Open Vacancies</div><div class="value">{{ data.open_vacancies }}</div></div>
+</div>
+<div class="form-card">
+<h3 style="margin-bottom:1rem">Last 6 months</h3>
+<table>
+<thead><tr><th>Month</th><th>Inquiries</th><th>Applications</th></tr></thead>
+<tbody>
+{% for i in range(data.months|length) %}
+<tr>
+<td>{{ data.months[i] }}</td>
+<td>{{ data.inquiry_counts[i] }}</td>
+<td>{{ data.app_counts[i] }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

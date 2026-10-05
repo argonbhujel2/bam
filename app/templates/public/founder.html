@@ -1,0 +1,41 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}संस्थापक{% else %}Founder{% endif %} — Argon Bhujel · BAM Studio{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:55vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}संस्थापक{% else %}Founder{% endif %}</p>
+    <h1 style="max-width:16ch">Argon Bhujel</h1>
+    <p class="hero-desc">{{ get_setting('founder_title', 'Founder & Full-Stack Developer' if current_lang == 'en' else 'संस्थापक र फुल-स्ट्याक डेभलपर') }}</p>
+    <p class="text-muted" style="max-width:48ch;margin-bottom:1.5rem">{{ get_setting('founder_bio') }}</p>
+    <div class="hero-actions">
+      {% set gh = get_setting('founder_github') %}
+      {% set li = get_setting('founder_linkedin') %}
+      {% set web = get_setting('founder_website', 'https://argan.com.np') %}
+      {% if gh %}<a href="{{ gh }}" class="btn" target="_blank" rel="noopener">GitHub</a>{% endif %}
+      {% if li %}<a href="{{ li }}" class="btn" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+      {% if web %}<a href="{{ web }}" class="btn btn-primary" target="_blank" rel="noopener">argan.com.np</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section"><div class="container" style="max-width:720px">
+  <div data-reveal class="case-block">
+    <p class="section-label">{% if current_lang == 'ne' %}दर्शन{% else %}Philosophy{% endif %}</p>
+    <p class="text-muted" style="font-size:var(--text-lg)">{{ get_setting('founder_philosophy') }}</p>
+  </div>
+  <div data-reveal class="case-block">
+    <p class="section-label">{% if current_lang == 'ne' %}कौशल{% else %}Skills{% endif %}</p>
+    <div class="tech-strip" style="justify-content:flex-start;border:none;padding:0">
+      {% for tech in tech_items %}<span class="tech-item">{{ tech.name }}</span>{% endfor %}
+    </div>
+  </div>
+  <div data-reveal class="case-block">
+    <p class="section-label">{% if current_lang == 'ne' %}परियोजनाहरू{% else %}Selected projects{% endif %}</p>
+    <ul class="founder-projects">
+      {% for p in projects %}
+      <li><a href="{{ url_for('public.project_detail', slug=p.slug) }}">{{ p.title }}</a>{% if p.live_url %} · <a href="{{ p.live_url }}" target="_blank" rel="noopener" class="text-muted text-sm">Live</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div></section>
+{% endblock %}

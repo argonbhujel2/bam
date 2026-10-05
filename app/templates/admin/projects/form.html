@@ -1,0 +1,132 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if project else 'New' }} Project{% endblock %}
+{% block header %}{{ 'Edit' if project else 'New' }} Project{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group">
+    <label>Title *</label>
+    <input type="text" name="title" value="{{ project.title if project else '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Slug</label>
+    <input type="text" name="slug" value="{{ project.slug if project else '' }}" placeholder="auto-generated if empty">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Description (EN)</label>
+      <textarea name="description_en">{{ project.description_en if project else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Description (NE)</label>
+      <textarea name="description_ne">{{ project.description_ne if project else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Full Description (EN)</label>
+      <textarea name="full_description_en">{{ project.full_description_en if project else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Full Description (NE)</label>
+      <textarea name="full_description_ne">{{ project.full_description_ne if project else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Challenge (EN)</label>
+      <textarea name="challenge_en">{{ project.challenge_en if project else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Challenge (NE)</label>
+      <textarea name="challenge_ne">{{ project.challenge_ne if project else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Solution (EN)</label>
+      <textarea name="solution_en">{{ project.solution_en if project else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Solution (NE)</label>
+      <textarea name="solution_ne">{{ project.solution_ne if project else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Client</label>
+      <input type="text" name="client" value="{{ project.client if project else '' }}">
+    </div>
+    <div class="form-group">
+      <label>Location</label>
+      <input type="text" name="location" value="{{ project.location if project else '' }}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Technologies (comma-separated)</label>
+    <input type="text" name="technologies" value="{{ project.technologies|join(', ') if project and project.technologies else '' }}">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Live URL (Demo)</label>
+      <input type="url" name="live_url" value="{{ project.live_url if project else '' }}">
+    </div>
+    <div class="form-group">
+      <label>GitHub URL</label>
+      <input type="url" name="github_url" value="{{ project.github_url if project else '' }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Year</label>
+      <input type="text" name="project_year" value="{{ project.project_year if project else '' }}" placeholder="2025">
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status">
+        {% for s in ['Live', 'Completed', 'In Progress'] %}
+        <option value="{{ s }}" {% if project and project.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Result (EN)</label>
+      <textarea name="result_en">{{ project.result_en if project else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Result (NE)</label>
+      <textarea name="result_ne">{{ project.result_ne if project else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Category</label>
+      <select name="category_id">
+        <option value="">—</option>
+        {% for c in categories %}
+        <option value="{{ c.id }}" {% if project and project.category_id == c.id %}selected{% endif %}>{{ c.name_en }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Display Order</label>
+      <input type="number" name="display_order" value="{{ project.display_order if project else 0 }}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Cover Image</label>
+    <input type="file" name="cover_image" accept="image/*">
+    {% if project and project.cover_image %}
+    <p style="margin-top:0.5rem"><img src="{{ project.cover_image }}" alt="" style="max-width:200px;border-radius:4px"></p>
+    {% endif %}
+  </div>
+  <div class="form-group" style="display:flex;gap:1.5rem">
+    <label><input type="checkbox" name="is_featured" {% if project and project.is_featured %}checked{% endif %}> Featured</label>
+    <label><input type="checkbox" name="is_published" {% if project and project.is_published %}checked{% endif %}> Published</label>
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.projects') }}" class="btn">Cancel</a>
+</form>
+{% endblock %}

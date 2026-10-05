@@ -1,0 +1,38 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}क्यारियर — BAM Studio{% else %}Careers — BAM Studio{% endif %}{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:50vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}क्यारियर{% else %}Careers{% endif %}</p>
+    <h1 style="max-width:16ch">
+      {% if current_lang == 'ne' %}BAM Studio सँग डिजिटल भविष्य निर्माण गर्नुहोस्।{% else %}BUILD THE FUTURE WITH BAM STUDIO.{% endif %}
+    </h1>
+    <p class="hero-desc">
+      {% if current_lang == 'ne' %}
+        वास्तविक डिजिटल उत्पादन निर्माण गर्ने टोलीमा सामेल हुनुहोस्, केवल अवधारणा होइन।
+      {% else %}
+        Join a team that builds real digital products, not just concepts.
+      {% endif %}
+    </p>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container" style="max-width:800px">
+    {% for v in vacancies %}
+    <a href="{{ url_for('public.career_detail', slug=v.slug) }}" class="career-card" data-reveal>
+      <div>
+        <h3>{{ v.get_title(current_lang) }}</h3>
+        <div class="meta">
+          {{ v.department or '' }} · {{ v.location or '' }} · {{ v.employment_type or '' }}
+        </div>
+      </div>
+      <span class="btn">{% if current_lang == 'ne' %}आवेदन{% else %}Apply{% endif %} →</span>
+    </a>
+    {% else %}
+    <p class="text-muted" style="text-align:center;padding:3rem 0">
+      {% if current_lang == 'ne' %}हाल कुनै खुला पद छैन। चाँडै फेरि जाँच गर्नुहोस्।{% else %}No open positions at the moment. Check back soon.{% endif %}
+    </p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

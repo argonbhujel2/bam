@@ -1,0 +1,223 @@
+{% extends "public/base.html" %}
+{% block title %}BAM Studio — {% if current_lang == 'ne' %}डिजिटल अनुभव। ईन्जिनियर गरिएको।{% else %}Digital Experiences. Engineered.{% endif %}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-media" aria-hidden="true">
+    {% set hero_bg = get_setting('hero_bg_image', '') %}
+    <img src="{{ hero_bg if hero_bg else url_for('static', filename='images/hero/hero-bg.jpg') }}" alt="" loading="eager">
+  </div>
+  <div class="hero-content">
+    <p class="hero-label">BAM Studio</p>
+    <h1>{% if current_lang == 'ne' %}{{ hero.heading_ne }}{% else %}{{ hero.heading_en }}{% endif %}</h1>
+    <p class="hero-desc">{% if current_lang == 'ne' %}{{ hero.desc_ne }}{% else %}{{ hero.desc_en }}{% endif %}</p>
+    <p class="text-muted text-sm" style="margin-bottom:1.5rem;max-width:42ch">
+      {% if current_lang == 'ne' %}म वेबसाइट मात्र डिजाइन गर्दिनँ। म तिनका पछाडिका प्रणालीहरू निर्माण गर्छु।{% else %}I don't just design websites. I build the systems behind them.{% endif %}
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('public.work') }}" class="btn btn-primary btn-lg btn-magnetic">{% if current_lang == 'ne' %}काम हेर्नुहोस्{% else %}View Our Work{% endif %}</a>
+      <a href="{{ url_for('public.contact') }}" class="btn btn-lg btn-magnetic">{% if current_lang == 'ne' %}परियोजना सुरु गर्नुहोस्{% else %}Start a Project{% endif %}</a>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">{% if current_lang == 'ne' %}अन्वेषण{% else %}SCROLL{% endif %}<span></span></div>
+</section>
+
+<section class="section" id="selected-work">
+  <div class="container">
+    <p class="section-label" data-reveal>{% if current_lang == 'ne' %}चयनित काम{% else %}Selected work{% endif %}</p>
+    <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}वास्तविक उत्पादन · वास्तविक व्यवसाय · वास्तविक प्रणाली{% else %}Real products · Real businesses · Real systems{% endif %}</h2>
+    <div class="work-grid">
+      {% for p in projects %}
+      <a href="{{ url_for('public.project_detail', slug=p.slug) }}" class="work-card" data-reveal>
+        {% if p.cover_image %}<img src="{{ p.cover_image }}" alt="{{ p.title }}" loading="lazy">{% else %}<div class="work-card-placeholder">{{ p.title }}</div>{% endif %}
+        <div class="work-card-overlay" style="opacity:1">
+          <h3>{{ p.title }}</h3>
+          <span class="cat">{% if p.category %}{{ p.category.get_name(current_lang) }}{% endif %}{% if p.status %} · {{ p.status }}{% endif %}{% if p.project_year %} · {{ p.project_year }}{% endif %}</span>
+          <span class="text-xs" style="margin-top:0.5rem;display:inline-block">{% if current_lang == 'ne' %}केस स्टडी{% else %}View Case Study{% endif %} →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <div style="margin-top:2rem" data-reveal><a href="{{ url_for('public.work') }}" class="btn">{% if current_lang == 'ne' %}सबै काम{% else %}All Work{% endif %} →</a></div>
+  </div>
+</section>
+
+
+<section class="section" id="behind-work">
+  <div class="container">
+    <p class="section-label" data-reveal>{% if current_lang == 'ne' %}कामको पछाडि{% else %}Behind the work{% endif %}</p>
+    <h2 class="section-title" data-reveal>
+      {% if current_lang == 'ne' %}स्टुडियोबाट{% else %}From the studio{% endif %}
+    </h2>
+    <p class="text-muted" style="max-width:42ch;margin-bottom:1.5rem" data-reveal>
+      {% if current_lang == 'ne' %}
+        हामीले निर्माण गर्दाका क्षणहरू — Media Library बाट।
+      {% else %}
+        Moments from building products — managed from the Media Library.
+      {% endif %}
+    </p>
+    {% if media_items %}
+    <div class="gallery-grid">
+      {% for m in media_items %}
+      <figure class="gallery-item" data-reveal>
+        <img src="{{ m.url }}" alt="{{ m.alt_text or m.original_filename or 'BAM Studio' }}" loading="lazy">
+        {% if m.alt_text %}<figcaption class="gallery-caption">{{ m.alt_text }}</figcaption>{% endif %}
+      </figure>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted" data-reveal>
+      {% if current_lang == 'ne' %}
+        Admin → Media Library मा image upload गर्नुहोस् — यहाँ देखिन्छ।
+      {% else %}
+        Upload images in Admin → Media Library — they appear here.
+      {% endif %}
+    </p>
+    {% endif %}
+  </div>
+</section>
+
+
+{% if stats %}
+<section class="section-sm" id="stats">
+  <div class="container">
+    <div class="stats-row" data-reveal>
+      {% for st in stats %}
+      <div class="stat-block">
+        <div class="stat-value">{{ st.value }}</div>
+        <div class="stat-label">{{ st.get_label(current_lang) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if client_names %}
+<section class="clients-section" data-reveal>
+  <div class="container">
+    <div class="clients-intro">
+      <p class="section-label">{% if current_lang == 'ne' %}ग्राहकहरू{% else %}Clients{% endif %}</p>
+      <h2 class="clients-heading">
+        {% if current_lang == 'ne' %}
+          साना व्यवसायदेखि वास्तविक प्रणालीसम्म — हामी दिगो डिजिटल उत्पादन बनाउँछौं।
+        {% else %}
+          From local businesses to live systems — we build digital products that last.
+        {% endif %}
+      </h2>
+    </div>
+    <div class="clients-grid">
+      {% if clients %}
+        {% for c in clients %}
+        <div class="client-cell">
+          {% if c.website_url %}<a href="{{ c.website_url }}" target="_blank" rel="noopener" class="client-cell-link">{% endif %}
+          {% if c.logo_url %}
+            <img src="{{ c.logo_url }}" alt="{{ c.name }}" class="client-logo-img" loading="lazy">
+          {% else %}
+            <span class="client-logo-text">{{ c.name }}</span>
+          {% endif %}
+          {% if c.website_url %}</a>{% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        {% for name in client_names %}
+        <div class="client-cell">
+          <span class="client-logo-text">{{ name }}</span>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="clients-footer">
+      <a href="{{ url_for('public.work') }}" class="clients-link">
+        {% if current_lang == 'ne' %}सबै परियोजनाहरू हेर्नुहोस्{% else %}View All Projects{% endif %}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}क्षमताहरू{% else %}Capabilities{% endif %}</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}हामी के निर्माण गर्छौं{% else %}What we build{% endif %}</h2>
+  <div class="services-list">
+    {% for s in services %}
+    <a href="{{ url_for('public.service_detail', id=s.id) }}" class="service-row" data-reveal>
+      <span class="num">{{ s.number }}</span>
+      {% if s.image %}<img src="{{ s.image }}" alt="" class="service-thumb" loading="lazy">{% endif %}
+      <div>
+        <h3>{{ s.get_title(current_lang) }}</h3>
+        <p>{{ s.get_description(current_lang) }}</p>
+      </div>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+    {% endfor %}
+  </div>
+</div></section>
+
+
+
+{% if tech_items %}
+<section class="section-sm"><div class="container" data-reveal>
+  <p class="section-label" style="text-align:center">{% if current_lang == 'ne' %}प्रविधि{% else %}Built with{% endif %}</p>
+  <div class="tech-strip">{% for tech in tech_items %}<span class="tech-item">{{ tech.name }}</span>{% endfor %}</div>
+</div></section>
+{% endif %}
+
+<section class="section"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}किन BAM Studio?{% else %}Why BAM Studio?{% endif %}</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}व्यावहारिक डिजिटल उत्पादन{% else %}Practical digital products{% endif %}</h2>
+  <div class="why-grid">
+    {% set why = [('Built from scratch','सुरुदेखि निर्माण'),('Performance focused','प्रदर्शन केन्द्रित'),('Mobile first','मोबाइल पहिले'),('Secure architecture','सुरक्षित आर्किटेक्चर'),('Easy to maintain','मर्मत गर्न सजिलो'),('Direct communication','प्रत्यक्ष सञ्चार')] %}
+    {% for en, ne in why %}<div class="why-card" data-reveal><span class="why-check">✓</span><span>{% if current_lang == 'ne' %}{{ ne }}{% else %}{{ en }}{% endif %}</span></div>{% endfor %}
+  </div>
+</div></section>
+
+{% if testimonials %}
+<section class="section"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}प्रतिक्रिया{% else %}Testimonials{% endif %}</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}ग्राहक भनाइ{% else %}What clients say{% endif %}</h2>
+  <div class="testimonial-grid">
+    {% for tm in testimonials %}
+    <blockquote class="testimonial-card" data-reveal>
+      <div class="stars">{% for i in range(tm.rating or 5) %}★{% endfor %}</div>
+      <p>{{ tm.get_review(current_lang) }}</p>
+      <footer><strong>{{ tm.client_name }}</strong>{% if tm.company %}<span class="text-muted"> — {{ tm.company }}</span>{% endif %}</footer>
+    </blockquote>
+    {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+<section class="section"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}प्रक्रिया{% else %}Process{% endif %}</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}हामी कसरी काम गर्छौं{% else %}How we work{% endif %}</h2>
+  <div class="process-cinematic">
+    {% for step in process_steps %}
+    <div class="process-step" data-reveal><span class="num">{{ step.number }}</span><div><h3>{{ step.get_title(current_lang) }}</h3><p>{{ step.get_description(current_lang) }}</p></div></div>
+    {% endfor %}
+  </div>
+</div></section>
+
+{% if faqs %}
+<section class="section"><div class="container" style="max-width:800px">
+  <p class="section-label" data-reveal>FAQ</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}बारम्बार सोधिने प्रश्नहरू{% else %}Frequently asked questions{% endif %}</h2>
+  <div class="faq-list">
+    {% for f in faqs %}<details class="faq-item" data-reveal><summary>{{ f.get_question(current_lang) }}</summary><p>{{ f.get_answer(current_lang) }}</p></details>{% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+<section class="careers-teaser"><div class="container" data-reveal>
+  <h2>{% if current_lang == 'ne' %}हामी सधैं निर्माण गर्ने मानिसहरू खोजिरहेका छौं।{% else %}WE'RE ALWAYS LOOKING FOR PEOPLE WHO BUILD.{% endif %}</h2>
+  <p>{% if current_lang == 'ne' %}अवसरहरू अन्वेषण गर्नुहोस्.{% else %}Explore opportunities to work with BAM Studio.{% endif %}{% if open_careers_count %} ({{ open_careers_count }}){% endif %}</p>
+  <a href="{{ url_for('public.careers') }}" class="btn btn-primary">{% if current_lang == 'ne' %}क्यारियर{% else %}View Careers{% endif %}</a>
+</div></section>
+
+<section class="final-cta"><div class="container" data-reveal>
+  <h2>{% if current_lang == 'ne' %}विचार छ? बनाऔं।{% else %}Have an idea? Let's build it.{% endif %}</h2>
+  <p>{% if current_lang == 'ne' %}व्यवसाय समस्या वा परियोजना छ भने कुरा गरौं।{% else %}Share a business problem or project — we'll take it from there.{% endif %}</p>
+  <a href="{{ url_for('public.contact') }}" class="btn btn-primary btn-lg btn-magnetic">{% if current_lang == 'ne' %}परियोजना सुरु गर्नुहोस्{% else %}Start a Project{% endif %} →</a>
+</div></section>
+{% endblock %}

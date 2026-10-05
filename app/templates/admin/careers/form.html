@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if career else 'New' }} Vacancy{% endblock %}
+{% block header %}{{ 'Edit' if career else 'New' }} Vacancy{% endblock %}
+{% block content %}
+<form method="POST" class="form-card">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-row">
+<div class="form-group"><label>Title (EN) *</label><input type="text" name="title_en" value="{{ career.title_en if career else '' }}" required></div>
+<div class="form-group"><label>Title (NE)</label><input type="text" name="title_ne" value="{{ career.title_ne if career else '' }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Department</label><input type="text" name="department" value="{{ career.department if career else '' }}"></div>
+<div class="form-group"><label>Location</label><input type="text" name="location" value="{{ career.location if career else 'Remote / Nepal' }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Employment Type</label>
+<select name="employment_type">
+{% for t in ['Full-time','Part-time','Contract','Intern'] %}
+<option value="{{ t }}" {% if career and career.employment_type==t %}selected{% endif %}>{{ t }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="form-group"><label>Experience</label><input type="text" name="experience" value="{{ career.experience if career else '' }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Salary Range</label><input type="text" name="salary_range" value="{{ career.salary_range if career else '' }}"></div>
+<div class="form-group"><label>Deadline</label><input type="date" name="deadline" value="{{ career.deadline if career and career.deadline else '' }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Description (EN)</label><textarea name="description_en">{{ career.description_en if career else '' }}</textarea></div>
+<div class="form-group"><label>Description (NE)</label><textarea name="description_ne">{{ career.description_ne if career else '' }}</textarea></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Responsibilities (EN)</label><textarea name="responsibilities_en">{{ career.responsibilities_en if career else '' }}</textarea></div>
+<div class="form-group"><label>Responsibilities (NE)</label><textarea name="responsibilities_ne">{{ career.responsibilities_ne if career else '' }}</textarea></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Requirements (EN)</label><textarea name="requirements_en">{{ career.requirements_en if career else '' }}</textarea></div>
+<div class="form-group"><label>Requirements (NE)</label><textarea name="requirements_ne">{{ career.requirements_ne if career else '' }}</textarea></div>
+</div>
+<div class="form-group"><label>Skills (comma-separated)</label><input type="text" name="skills" value="{{ career.skills|join(', ') if career and career.skills else '' }}"></div>
+<div class="form-row">
+<div class="form-group"><label>Status</label>
+<select name="status">
+{% for s in ['draft','open','closed'] %}
+<option value="{{ s }}" {% if career and career.status==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="form-group"><label>Display Order</label><input type="number" name="display_order" value="{{ career.display_order if career else 0 }}"></div>
+</div>
+<button type="submit" class="btn btn-primary">Save</button>
+<a href="{{ url_for('admin.careers') }}" class="btn">Cancel</a>
+</form>
+{% endblock %}

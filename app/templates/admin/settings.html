@@ -1,0 +1,75 @@
+{% extends "admin/base.html" %}
+{% block title %}Settings{% endblock %}
+{% block header %}Site Settings{% endblock %}
+{% block content %}
+
+<form method="POST" enctype="multipart/form-data" class="form-card">
+<div class="form-card" style="margin-bottom:1.5rem">
+  <h3 style="margin-bottom:1rem">Logo & Favicon</h3>
+  <p style="color:#6b7280;font-size:0.85rem;margin-bottom:1rem">Upload files directly, or paste a URL. Used on the public site and browser tab.</p>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Site logo (file)</label>
+      <input type="file" name="logo_file" accept="image/*">
+      {% set logo = get_setting('site_logo', '') %}
+      {% if logo %}<img src="{{ logo }}" alt="logo" style="height:40px;margin-top:0.5rem;border-radius:6px">{% endif %}
+    </div>
+    <div class="form-group">
+      <label>Favicon (file)</label>
+      <input type="file" name="favicon_file" accept="image/*">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Site logo URL (optional override)</label>
+    <input type="text" name="site_logo" value="{{ get_setting('site_logo', '') }}" placeholder="/static/images/logo.png">
+  </div>
+  <div class="form-group">
+    <label>Favicon URL (optional override)</label>
+    <input type="text" name="site_favicon" value="{{ get_setting('site_favicon', '') }}">
+  </div>
+  <div class="form-group">
+    <label>Hero background (file)</label>
+    <input type="file" name="hero_bg_file" accept="image/*">
+  </div>
+  <div class="form-group">
+    <label>Hero background URL</label>
+    <input type="text" name="hero_bg_image" value="{{ get_setting('hero_bg_image', '') }}">
+  </div>
+</div>
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<h3 style="margin-bottom:1rem">General</h3>
+<div class="form-group"><label>Site Name</label><input type="text" name="site_name" value="{{ get_setting('site_name', 'BAM Studio') }}"></div>
+<div class="form-group"><label>Tagline</label><input type="text" name="site_tagline" value="{{ get_setting('site_tagline') }}"></div>
+<div class="form-row">
+<div class="form-group"><label>Email</label><input type="email" name="email" value="{{ get_setting('email') }}"></div>
+<div class="form-group"><label>Phone</label><input type="text" name="phone" value="{{ get_setting('phone') }}"></div>
+</div>
+<div class="form-group"><label>Address</label><input type="text" name="address" value="{{ get_setting('address') }}"></div>
+<h3 style="margin:1.5rem 0 1rem">Homepage Hero</h3>
+<div class="form-row">
+<div class="form-group"><label>Hero Heading (EN)</label><input type="text" name="hero_heading_en" value="{{ get_setting('hero_heading') }}"></div>
+<div class="form-group"><label>Hero Heading (NE)</label><input type="text" name="hero_heading_ne" value="{{ get_setting('hero_heading', lang='ne') }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Hero Description (EN)</label><textarea name="hero_desc_en">{{ get_setting('hero_desc') }}</textarea></div>
+<div class="form-group"><label>Hero Description (NE)</label><textarea name="hero_desc_ne">{{ get_setting('hero_desc', lang='ne') }}</textarea></div>
+</div>
+<h3 style="margin:1.5rem 0 1rem">Social</h3>
+<div class="form-row">
+<div class="form-group"><label>Facebook</label><input type="url" name="facebook" value="{{ get_setting('facebook') }}"></div>
+<div class="form-group"><label>Instagram</label><input type="url" name="instagram" value="{{ get_setting('instagram') }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>LinkedIn</label><input type="url" name="linkedin" value="{{ get_setting('linkedin') }}"></div>
+<div class="form-group"><label>GitHub</label><input type="url" name="github" value="{{ get_setting('github') }}"></div>
+</div>
+<div class="form-group"><label>YouTube</label><input type="url" name="youtube" value="{{ get_setting('youtube') }}"></div>
+<h3 style="margin:1.5rem 0 1rem">Footer & SEO</h3>
+<div class="form-group"><label>Footer Description</label><textarea name="footer_description">{{ get_setting('footer_description') }}</textarea></div>
+<div class="form-group"><label>Copyright</label><input type="text" name="copyright" value="{{ get_setting('copyright') }}"></div>
+<div class="form-group"><label>SEO Default Title</label><input type="text" name="seo_default_title" value="{{ get_setting('seo_default_title') }}"></div>
+<div class="form-group"><label>SEO Default Description</label><textarea name="seo_default_description">{{ get_setting('seo_default_description') }}</textarea></div>
+<button type="submit" class="btn btn-primary">Save Settings</button>
+</form>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}Application{% endblock %}
+{% block header %}Application — {{ application.full_name }}{% endblock %}
+{% block content %}
+<div class="form-card">
+<p><strong>Position:</strong> {{ application.career.title_en if application.career else '—' }}</p>
+<p><strong>Email:</strong> {{ application.email }}</p>
+<p><strong>Phone:</strong> {{ application.phone or '—' }}</p>
+<p><strong>Experience:</strong> {{ application.experience or '—' }}</p>
+<p><strong>Portfolio:</strong> {% if application.portfolio_url %}<a href="{{ application.portfolio_url }}" target="_blank">{{ application.portfolio_url }}</a>{% else %}—{% endif %}</p>
+<p><strong>GitHub:</strong> {% if application.github_url %}<a href="{{ application.github_url }}" target="_blank">{{ application.github_url }}</a>{% else %}—{% endif %}</p>
+<p><strong>LinkedIn:</strong> {% if application.linkedin_url %}<a href="{{ application.linkedin_url }}" target="_blank">{{ application.linkedin_url }}</a>{% else %}—{% endif %}</p>
+{% if application.cv_url %}<p><strong>CV:</strong> <a href="{{ application.cv_url }}" target="_blank" class="btn">Download CV</a></p>{% endif %}
+{% if application.cover_message %}<p><strong>Cover message:</strong></p><p style="white-space:pre-line;color:#aaa">{{ application.cover_message }}</p>{% endif %}
+<form method="POST" style="margin-top:1.5rem">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-group">
+<label>Status</label>
+<select name="status">
+{% for s in ['new','shortlisted','interview','selected','rejected'] %}
+<option value="{{ s }}" {% if application.status==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="form-group">
+<label>Internal notes</label>
+<textarea name="internal_notes">{{ application.internal_notes or '' }}</textarea>
+</div>
+<button type="submit" class="btn btn-primary">Update</button>
+<a href="{{ url_for('admin.applications') }}" class="btn">Back</a>
+</form>
+</div>
+{% endblock %}

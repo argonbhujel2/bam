@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block title %}Edit client{% endblock %}
+{% block header %}Edit client{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card" style="max-width:560px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label>Name *</label><input type="text" name="name" value="{{ client.name }}" required></div>
+  <div class="form-group">
+    <label>Logo</label>
+    {% if client.logo_url %}<div style="margin-bottom:0.5rem"><img src="{{ client.logo_url }}" alt="" style="height:48px;background:#fff;padding:6px;border-radius:6px"></div>{% endif %}
+    <input type="file" name="logo" accept="image/*">
+  </div>
+  <div class="form-group"><label>Website URL</label><input type="url" name="website_url" value="{{ client.website_url or '' }}"></div>
+  <div class="form-group"><label>Display order</label><input type="number" name="display_order" value="{{ client.display_order or 0 }}"></div>
+  <label><input type="checkbox" name="is_active" {% if client.is_active %}checked{% endif %}> Active</label>
+  <div style="margin-top:1rem;display:flex;gap:0.5rem">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('admin.clients') }}" class="btn">Cancel</a>
+  </div>
+</form>
+{% endblock %}

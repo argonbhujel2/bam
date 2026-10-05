@@ -1,0 +1,115 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}सम्पर्क — BAM Studio{% else %}Contact — BAM Studio{% endif %}{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:40vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}सम्पर्क{% else %}Contact{% endif %}</p>
+    <h1 style="max-width:14ch">
+      {% if current_lang == 'ne' %}केहि निर्माण गरौं।{% else %}LET'S BUILD SOMETHING.{% endif %}
+    </h1>
+    <p class="hero-desc">
+      {% if current_lang == 'ne' %}
+        विचार, व्यवसाय समस्या वा परियोजना छ? कुरा गरौं।
+      {% else %}
+        Have an idea, business problem or project? Let's talk.
+      {% endif %}
+    </p>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info" data-reveal>
+        <p class="section-label">{% if current_lang == 'ne' %}जानकारी{% else %}Get in touch{% endif %}</p>
+        {% set email = get_setting('email', 'hello@bamstudio.com') %}
+        {% set phone = get_setting('phone', '') %}
+        {% set address = get_setting('address', 'Nepal') %}
+        {% if email %}<p><a href="mailto:{{ email }}">{{ email }}</a></p>{% endif %}
+        {% if phone %}<p><a href="tel:{{ phone }}">{{ phone }}</a></p>{% endif %}
+        <p>{{ address }}</p>
+      </div>
+      <div data-reveal>
+        <h2 class="section-title" style="font-size:var(--text-xl);margin-bottom:1.5rem">
+          {% if current_lang == 'ne' %}परियोजना सोधपुछ{% else %}Project Inquiry{% endif %}
+        </h2>
+        <form method="POST" action="{{ url_for('public.contact') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {{ inquiry_form.hidden_tag() }}
+          <input type="hidden" name="form_type" value="inquiry">
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ inquiry_form.name.label.text }} <span class="req" aria-hidden="true">*</span></label>
+              {{ inquiry_form.name(required=True) }}
+            </div>
+            <div class="form-group">
+              <label>{{ inquiry_form.email.label.text }} <span class="req" aria-hidden="true">*</span></label>
+              {{ inquiry_form.email(required=True) }}
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ inquiry_form.phone.label }}</label>
+              {{ inquiry_form.phone() }}
+            </div>
+            <div class="form-group">
+              <label>{{ inquiry_form.company.label }}</label>
+              {{ inquiry_form.company() }}
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ inquiry_form.project_type.label.text }} <span class="req" aria-hidden="true">*</span></label>
+              {{ inquiry_form.project_type() }}
+            </div>
+            <div class="form-group">
+              <label>{{ inquiry_form.budget.label }}</label>
+              {{ inquiry_form.budget() }}
+            </div>
+          </div>
+          <div class="form-group">
+            <label>{{ inquiry_form.message.label.text }} <span class="req" aria-hidden="true">*</span></label>
+            {{ inquiry_form.message(required=True) }}
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg">
+            {% if current_lang == 'ne' %}सोधपुछ पठाउनुहोस्{% else %}Send Inquiry{% endif %}
+          </button>
+        </form>
+
+        <h2 class="section-title" style="font-size:var(--text-xl);margin:3rem 0 1.5rem">
+          {% if current_lang == 'ne' %}सामान्य सन्देश{% else %}General Message{% endif %}
+        </h2>
+        <form method="POST" action="{{ url_for('public.contact') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {{ form.hidden_tag() }}
+          <input type="hidden" name="form_type" value="contact">
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ form.name.label.text }} <span class="req" aria-hidden="true">*</span></label>
+              {{ form.name(required=True) }}
+            </div>
+            <div class="form-group">
+              <label>{{ form.email.label.text }} <span class="req" aria-hidden="true">*</span></label>
+              {{ form.email(required=True) }}
+            </div>
+          </div>
+          <div class="form-group">
+            <label>{{ form.phone.label }}</label>
+            {{ form.phone() }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.subject.label }}</label>
+            {{ form.subject() }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.message.label.text }} <span class="req" aria-hidden="true">*</span></label>
+            {{ form.message(required=True) }}
+          </div>
+          <button type="submit" class="btn btn-primary">
+            {% if current_lang == 'ne' %}सन्देश पठाउनुहोस्{% else %}Send Message{% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

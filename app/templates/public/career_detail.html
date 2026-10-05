@@ -1,0 +1,90 @@
+{% extends "public/base.html" %}
+{% block title %}{{ career.get_title(current_lang) }} — BAM Studio{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:40vh">
+  <div class="hero-content">
+    <p class="hero-label">{{ career.department or 'BAM Studio' }}</p>
+    <h1 style="font-size:var(--text-4xl)">{{ career.get_title(current_lang) }}</h1>
+    <div class="project-meta">
+      <span><strong>{% if current_lang == 'ne' %}स्थान{% else %}Location{% endif %}</strong>{{ career.location }}</span>
+      <span><strong>{% if current_lang == 'ne' %}प्रकार{% else %}Type{% endif %}</strong>{{ career.employment_type }}</span>
+      {% if career.experience %}<span><strong>{% if current_lang == 'ne' %}अनुभव{% else %}Experience{% endif %}</strong>{{ career.experience }}</span>{% endif %}
+      {% if career.salary_range %}<span><strong>{% if current_lang == 'ne' %}तलब{% else %}Salary{% endif %}</strong>{{ career.salary_range }}</span>{% endif %}
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container" style="max-width:720px">
+    {% if career.get_description(current_lang) %}
+    <div data-reveal style="margin-bottom:2.5rem">
+      <h2 class="section-title" style="font-size:var(--text-xl)">{% if current_lang == 'ne' %}विवरण{% else %}Description{% endif %}</h2>
+      <p class="text-muted" style="white-space:pre-line">{{ career.get_description(current_lang) }}</p>
+    </div>
+    {% endif %}
+    {% if career.get_responsibilities(current_lang) %}
+    <div data-reveal style="margin-bottom:2.5rem">
+      <h2 class="section-title" style="font-size:var(--text-xl)">{% if current_lang == 'ne' %}जिम्मेवारीहरू{% else %}Responsibilities{% endif %}</h2>
+      <p class="text-muted" style="white-space:pre-line">{{ career.get_responsibilities(current_lang) }}</p>
+    </div>
+    {% endif %}
+    {% if career.get_requirements(current_lang) %}
+    <div data-reveal style="margin-bottom:2.5rem">
+      <h2 class="section-title" style="font-size:var(--text-xl)">{% if current_lang == 'ne' %}आवश्यकताहरू{% else %}Requirements{% endif %}</h2>
+      <p class="text-muted" style="white-space:pre-line">{{ career.get_requirements(current_lang) }}</p>
+    </div>
+    {% endif %}
+
+    <div data-reveal style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--color-border)">
+      <h2 class="section-title" style="font-size:var(--text-xl)">{% if current_lang == 'ne' %}आवेदन दिनुहोस्{% else %}Apply{% endif %}</h2>
+      <form method="POST" enctype="multipart/form-data" style="margin-top:1.5rem">
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ form.full_name.label }}</label>
+            {{ form.full_name(required=True) }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.email.label }}</label>
+            {{ form.email(required=True) }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ form.phone.label }}</label>
+            {{ form.phone() }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.experience.label }}</label>
+            {{ form.experience() }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ form.portfolio.label }}</label>
+          {{ form.portfolio(placeholder='https://') }}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ form.github.label }}</label>
+            {{ form.github(placeholder='https://github.com/') }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.linkedin.label }}</label>
+            {{ form.linkedin(placeholder='https://linkedin.com/in/') }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ form.cv.label }} (PDF / Word)</label>
+          {{ form.cv() }}
+        </div>
+        <div class="form-group">
+          <label>{{ form.cover_message.label }}</label>
+          {{ form.cover_message() }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">
+          {% if current_lang == 'ne' %}आवेदन पेश गर्नुहोस्{% else %}Submit Application{% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

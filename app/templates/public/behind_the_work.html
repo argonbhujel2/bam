@@ -1,0 +1,41 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}कामको पछाडि — BAM Studio{% else %}Behind the work — BAM Studio{% endif %}{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:42vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}ग्यालेरी{% else %}Gallery{% endif %}</p>
+    <h1 style="max-width:16ch">
+      {% if current_lang == 'ne' %}कामको पछाडि{% else %}Behind the work{% endif %}
+    </h1>
+    <p class="hero-desc">
+      {% if current_lang == 'ne' %}
+        स्टुडियोबाट — Media Library बाट व्यवस्थापन गरिएका क्षणहरू।
+      {% else %}
+        Moments from the studio — managed from the Media Library.
+      {% endif %}
+    </p>
+  </div>
+</section>
+<section class="section" id="behind-work" style="padding-top:0">
+  <div class="container">
+    {% if media_items %}
+    <div class="gallery-grid">
+      {% for m in media_items %}
+      <figure class="gallery-item" data-reveal>
+        <img src="{{ m.url }}" alt="{{ m.alt_text or m.original_filename or 'BAM Studio' }}" loading="lazy">
+        {% if m.alt_text %}<figcaption class="gallery-caption">{{ m.alt_text }}</figcaption>{% endif %}
+      </figure>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted" data-reveal>
+      {% if current_lang == 'ne' %}
+        Admin → Media Library मा image upload गर्नुहोस्।
+      {% else %}
+        Upload images in Admin → Media Library to fill this gallery.
+      {% endif %}
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
