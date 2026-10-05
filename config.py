@@ -18,6 +18,11 @@ class Config:
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://", 1
         )
+    # Neon / managed Postgres: ensure SSL
+    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgresql"):
+        if "sslmode=" not in SQLALCHEMY_DATABASE_URI:
+            sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + sep + "sslmode=require"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
