@@ -229,6 +229,42 @@ def create_app(config_name=None):
                 dedupe_tech_items()
             except Exception:
                 pass
+            # Repair hero_heading if English field was saved with Nepali text
+            try:
+                from app.models import SiteSetting
+                from app import db as _db
+                import re
+                _devanagari = re.compile(r"[\u0900-\u097F]")
+                hh = SiteSetting.query.filter_by(key="hero_heading").first()
+                if hh:
+                    en = (hh.value_en or "").strip()
+                    ne = (hh.value_ne or "").strip()
+                    if en and _devanagari.search(en) and (not ne or ne == en):
+                        # EN field has Nepali — move to NE, restore English default
+                        hh.value_ne = en
+                        hh.value_en = "WE BUILD DIGITAL EXPERIENCES."
+                        _db.session.commit()
+                    elif en and _devanagari.search(en) and ne and not _devanagari.search(ne):
+                        # EN and NE swapped
+                        hh.value_en, hh.value_ne = ne, en
+                        _db.session.commit()
+                hd = SiteSetting.query.filter_by(key="hero_desc").first()
+                if hd:
+                    en = (hd.value_en or "").strip()
+                    ne = (hd.value_ne or "").strip()
+                    if en and _devanagari.search(en) and (not ne or ne == en):
+                        hd.value_ne = en
+                        hd.value_en = "Websites, systems and digital solutions engineered for modern businesses."
+                        _db.session.commit()
+                    elif en and _devanagari.search(en) and ne and not _devanagari.search(ne):
+                        hd.value_en, hd.value_ne = ne, en
+                        _db.session.commit()
+            except Exception:
+                try:
+                    from app import db as _db
+                    _db.session.rollback()
+                except Exception:
+                    pass
             # Ensure SEO keywords setting exists (updates empty only)
             try:
                 from app.models import SiteSetting

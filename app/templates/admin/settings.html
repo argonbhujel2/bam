@@ -48,12 +48,12 @@
 <div class="form-group"><label>Address</label><input type="text" name="address" value="{{ get_setting('address') }}"></div>
 <h3 style="margin:1.5rem 0 1rem">Homepage Hero</h3>
 <div class="form-row">
-<div class="form-group"><label>Hero Heading (EN)</label><input type="text" name="hero_heading_en" value="{{ get_setting('hero_heading') }}"></div>
-<div class="form-group"><label>Hero Heading (NE)</label><input type="text" name="hero_heading_ne" value="{{ get_setting('hero_heading', lang='ne') }}"></div>
+<div class="form-group"><label>Hero Heading (EN)</label><input type="text" name="hero_heading_en" value="{{ get_setting('hero_heading', 'WE BUILD DIGITAL EXPERIENCES.', lang='en') }}"></div>
+<div class="form-group"><label>Hero Heading (NE)</label><input type="text" name="hero_heading_ne" value="{{ get_setting('hero_heading', 'हामी डिजिटल अनुभव निर्माण गर्छौं।', lang='ne') }}"></div>
 </div>
 <div class="form-row">
-<div class="form-group"><label>Hero Description (EN)</label><textarea name="hero_desc_en">{{ get_setting('hero_desc') }}</textarea></div>
-<div class="form-group"><label>Hero Description (NE)</label><textarea name="hero_desc_ne">{{ get_setting('hero_desc', lang='ne') }}</textarea></div>
+<div class="form-group"><label>Hero Description (EN)</label><textarea name="hero_desc_en">{{ get_setting('hero_desc', 'Websites, systems and digital solutions engineered for modern businesses.', lang='en') }}</textarea></div>
+<div class="form-group"><label>Hero Description (NE)</label><textarea name="hero_desc_ne">{{ get_setting('hero_desc', 'आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।', lang='ne') }}</textarea></div>
 </div>
 <h3 style="margin:1.5rem 0 1rem">Social</h3>
 <div class="form-row">

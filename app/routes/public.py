@@ -163,22 +163,30 @@ def home():
                 _seen.add(pr.client)
                 client_names.append(pr.client)
 
-    hero = {
-        "heading_en": get_setting("hero_heading", "WE BUILD DIGITAL EXPERIENCES."),
-        "heading_ne": get_setting("hero_heading", "हामी डिजिटल अनुभव निर्माण गर्छौं।", lang="ne") if False else get_setting("hero_heading", "हामी डिजिटल अनुभव निर्माण गर्छौं।"),
-        "desc_en": get_setting("hero_desc", "Websites, systems and digital solutions engineered for modern businesses."),
-        "desc_ne": get_setting("hero_desc", "आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।"),
-    }
-    # bilingual hero via settings get_value
+    # Always read EN and NE columns explicitly (never use current UI language here)
     from app.models import SiteSetting
+    _default_heading_en = "WE BUILD DIGITAL EXPERIENCES."
+    _default_heading_ne = "हामी डिजिटल अनुभव निर्माण गर्छौं।"
+    _default_desc_en = "Websites, systems and digital solutions engineered for modern businesses."
+    _default_desc_ne = "आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।"
+    hero = {
+        "heading_en": _default_heading_en,
+        "heading_ne": _default_heading_ne,
+        "desc_en": _default_desc_en,
+        "desc_ne": _default_desc_ne,
+    }
     hh = SiteSetting.query.filter_by(key="hero_heading").first()
     hd = SiteSetting.query.filter_by(key="hero_desc").first()
     if hh:
-        hero["heading_en"] = hh.value_en or hero["heading_en"]
-        hero["heading_ne"] = hh.value_ne or hero["heading_ne"]
+        if (hh.value_en or "").strip():
+            hero["heading_en"] = hh.value_en.strip()
+        if (hh.value_ne or "").strip():
+            hero["heading_ne"] = hh.value_ne.strip()
     if hd:
-        hero["desc_en"] = hd.value_en or hero["desc_en"]
-        hero["desc_ne"] = hd.value_ne or hero["desc_ne"]
+        if (hd.value_en or "").strip():
+            hero["desc_en"] = hd.value_en.strip()
+        if (hd.value_ne or "").strip():
+            hero["desc_ne"] = hd.value_ne.strip()
 
     return render_template(
         "public/home.html",
