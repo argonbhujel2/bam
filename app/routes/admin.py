@@ -539,6 +539,7 @@ def settings():
             "youtube",
             "seo_default_title",
             "seo_default_description",
+            "seo_keywords",
         ]
         keys = list(keys) + ["site_logo", "site_favicon", "hero_bg_image"]
         for key in keys:

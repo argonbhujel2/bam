@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ get_setting('seo_default_title', 'BAM Studio — Digital Experiences. Engineered.') }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ get_setting('seo_default_description', 'BAM Studio designs and builds websites, custom software, business systems and digital solutions.') }}{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}{{ get_setting('seo_keywords', 'BAM Studio, BAM Studio Nepal, Web Development Company Nepal, Website Design Nepal, Custom Web Development Nepal, Web Development in Urlabari, Full Stack Developer Nepal') }}{% endblock %}">
   <link rel="canonical" href="{{ request.url }}">
   {% set _logo = get_setting('site_logo', '') or url_for('static', filename='images/logo.png') %}
   {% set _fav = get_setting('site_favicon', '') or _logo %}

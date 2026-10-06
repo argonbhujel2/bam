@@ -69,7 +69,10 @@
 <div class="form-group"><label>Footer Description</label><textarea name="footer_description">{{ get_setting('footer_description') }}</textarea></div>
 <div class="form-group"><label>Copyright</label><input type="text" name="copyright" value="{{ get_setting('copyright') }}"></div>
 <div class="form-group"><label>SEO Default Title</label><input type="text" name="seo_default_title" value="{{ get_setting('seo_default_title') }}"></div>
-<div class="form-group"><label>SEO Default Description</label><textarea name="seo_default_description">{{ get_setting('seo_default_description') }}</textarea></div>
+<div class="form-group"><label>SEO Default Description</label><textarea name="seo_default_description" rows="3">{{ get_setting('seo_default_description') }}</textarea></div>
+<div class="form-group"><label>SEO Keywords</label><textarea name="seo_keywords" rows="6" placeholder="comma-separated keywords">{{ get_setting('seo_keywords') }}</textarea>
+  <small style="color:#64748b">Comma-separated. Primary + local + service keywords for meta keywords tag.</small>
+</div>
 <button type="submit" class="btn btn-primary">Save Settings</button>
 </form>
 {% endblock %}

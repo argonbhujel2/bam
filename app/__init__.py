@@ -229,6 +229,40 @@ def create_app(config_name=None):
                 dedupe_tech_items()
             except Exception:
                 pass
+            # Ensure SEO keywords setting exists (updates empty only)
+            try:
+                from app.models import SiteSetting
+                from app import db as _db
+                _kw = (
+                    "BAM Studio, BAM Studio Nepal, BAM Studio Urlabari, "
+                    "Web Development Company Nepal, Web Development Company Morang, "
+                    "Website Development Nepal, Website Design Nepal, Web Designer Nepal, "
+                    "Full Stack Developer Nepal, Custom Website Development Nepal, "
+                    "Web Development in Urlabari, Website Design in Urlabari, "
+                    "Web Development in Morang, Website Developer in Morang, "
+                    "Web Development in Damak, Website Design in Damak, "
+                    "Web Development in Pathari, Web Developer in Jhapa, "
+                    "Custom Web Development, Hotel Management System Nepal, "
+                    "Football Website Development Nepal, Event Ticketing Website, "
+                    "School Website Development Nepal, UI/UX Design Nepal, "
+                    "Flask Web Development, Python Web Development, "
+                    "नेपालमा वेबसाइट बनाउने कम्पनी, वेबसाइट डिजाइन नेपाल, "
+                    "उर्लाबारीमा वेबसाइट बनाउने, मोरङमा वेबसाइट डेभलपर, "
+                    "होटल म्यानेजमेन्ट सिस्टम, QR मेनु सिस्टम"
+                )
+                s = SiteSetting.query.filter_by(key="seo_keywords").first()
+                if not s:
+                    _db.session.add(SiteSetting(key="seo_keywords", value_en=_kw, group="seo"))
+                    _db.session.commit()
+                elif not (s.value_en or "").strip():
+                    s.value_en = _kw
+                    _db.session.commit()
+            except Exception:
+                try:
+                    from app import db as _db
+                    _db.session.rollback()
+                except Exception:
+                    pass
         except Exception as exc:
             try:
                 db.session.rollback()
