@@ -6,15 +6,37 @@ from app import mail
 
 
 def mail_configured():
-    server = current_app.config.get("MAIL_SERVER")
-    user = current_app.config.get("MAIL_USERNAME")
-    password = current_app.config.get("MAIL_PASSWORD")
+    server = (current_app.config.get("MAIL_SERVER") or "").strip()
+    user = (current_app.config.get("MAIL_USERNAME") or "").strip()
+    password = (current_app.config.get("MAIL_PASSWORD") or "").strip()
     ok = bool(server and user and password)
     if not ok:
         current_app.logger.warning(
-            "Mail incomplete — need MAIL_SERVER, MAIL_USERNAME, MAIL_PASSWORD in .env"
+            "Mail incomplete — need MAIL_SERVER, MAIL_USERNAME, MAIL_PASSWORD "
+            f"(server={bool(server)} user={bool(user)} password={bool(password)})"
         )
     return ok
+
+
+def mail_status():
+    """Human-readable mail config status for admin UI."""
+    server = (current_app.config.get("MAIL_SERVER") or "").strip()
+    user = (current_app.config.get("MAIL_USERNAME") or "").strip()
+    password = (current_app.config.get("MAIL_PASSWORD") or "").strip()
+    sender = (current_app.config.get("MAIL_DEFAULT_SENDER") or "").strip()
+    port = current_app.config.get("MAIL_PORT")
+    tls = current_app.config.get("MAIL_USE_TLS")
+    ssl = current_app.config.get("MAIL_USE_SSL")
+    return {
+        "configured": bool(server and user and password),
+        "server": server or "(empty)",
+        "port": port,
+        "tls": tls,
+        "ssl": ssl,
+        "username": user[:3] + "***" if len(user) > 3 else ("(empty)" if not user else "***"),
+        "password_set": bool(password),
+        "sender": sender or "(empty)",
+    }
 
 
 def _logo_path():
@@ -153,37 +175,63 @@ def _attach_logo(msg):
 
 
 def send_notification(subject, body_text, html_body=None, recipients=None, reply_to=None):
+    """Send email. Returns True on success, False on failure. Logs the real error."""
     if not mail_configured():
         current_app.logger.info("Mail not configured — skipping: %s", subject)
         return False
     if not recipients:
-        to = current_app.config.get("MAIL_NOTIFY_TO")
+        to = (current_app.config.get("MAIL_NOTIFY_TO") or "").strip() or None
         if not to:
             try:
                 from app.utils.helpers import get_setting
-                to = get_setting("email", "") or None
+                to = (get_setting("email", "") or "").strip() or None
             except Exception:
                 to = None
         if not to:
-            to = current_app.config.get("MAIL_DEFAULT_SENDER")
+            to = (current_app.config.get("MAIL_DEFAULT_SENDER") or "").strip() or None
         recipients = [to] if to else []
+    if isinstance(recipients, str):
+        recipients = [recipients]
+    recipients = [r.strip() for r in recipients if r and str(r).strip()]
     if not recipients:
+        current_app.logger.error("Email send failed: no recipients for %s", subject)
         return False
+    sender = (current_app.config.get("MAIL_DEFAULT_SENDER") or "").strip()
+    if not sender:
+        sender = recipients[0]
     try:
         msg = Message(
             subject=subject,
-            recipients=recipients if isinstance(recipients, list) else [recipients],
-            body=body_text,
+            recipients=recipients,
+            body=body_text or "",
             html=html_body,
-            sender=current_app.config.get("MAIL_DEFAULT_SENDER"),
+            sender=sender,
         )
         if reply_to:
             msg.reply_to = reply_to
-        _attach_logo(msg)
+        try:
+            _attach_logo(msg)
+        except Exception as logo_err:
+            current_app.logger.warning("Logo attach skipped: %s", logo_err)
         mail.send(msg)
+        current_app.logger.info("Email sent OK to %s subject=%s", recipients, subject)
         return True
     except Exception as e:
-        current_app.logger.error("Email send failed: %s", e)
+        current_app.logger.error(
+            "Email send failed to %s via %s:%s — %s: %s",
+            recipients,
+            current_app.config.get("MAIL_SERVER"),
+            current_app.config.get("MAIL_PORT"),
+            type(e).__name__,
+            e,
+            exc_info=True,
+        )
+        # Stash last error for admin flash messages
+        try:
+            from flask import g
+            g.last_mail_error = f"{type(e).__name__}: {e}"
+        except Exception:
+            pass
         return False
 
 

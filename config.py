@@ -74,6 +74,13 @@ class Config:
     # Optional: where notifications are delivered (defaults to MAIL_DEFAULT_SENDER)
     MAIL_NOTIFY_TO = (os.environ.get("MAIL_NOTIFY_TO") or "").strip() or None
 
+    # Normalize SMTP: port 465 → SSL, port 587 → TLS
+    if MAIL_PORT == 465 and not MAIL_USE_SSL:
+        MAIL_USE_SSL = True
+        MAIL_USE_TLS = False
+    elif MAIL_PORT == 587 and not MAIL_USE_TLS and not MAIL_USE_SSL:
+        MAIL_USE_TLS = True
+
     ADMIN_SETUP_SECRET = os.environ.get("ADMIN_SETUP_SECRET", "")
 
     SITE_URL = os.environ.get("SITE_URL", "http://localhost:5000")

@@ -676,22 +676,40 @@ def users():
         db.session.add(user)
         db.session.commit()
         try:
-            from app.utils.email import send_admin_credentials
-            from flask import url_for as _url_for
-            login_url = _url_for("admin_auth.login", _external=True)
-            sent = send_admin_credentials(
-                user.email, user.full_name, user.username, password, login_url, is_reset=False
-            )
-            if sent:
-                flash("User created. Login details emailed to " + user.email + ".", "success")
+            from app.utils.email import send_admin_credentials, mail_configured, mail_status
+            from flask import g
+            login_url = url_for("admin_auth.login", _external=True)
+            if not mail_configured():
+                st = mail_status()
+                flash(
+                    f"User created. Email NOT sent — mail not configured "
+                    f"(server={st['server']}, user={st['username']}, password_set={st['password_set']}). "
+                    f"Set MAIL_SERVER, MAIL_USERNAME, MAIL_PASSWORD on Vercel.",
+                    "warning",
+                )
             else:
-                flash("User created. Email not sent (check MAIL_* settings).", "warning")
+                sent = send_admin_credentials(
+                    user.email, user.full_name, user.username, password, login_url, is_reset=False
+                )
+                if sent:
+                    flash("User created. Login details emailed to " + user.email + ".", "success")
+                else:
+                    err = getattr(g, "last_mail_error", "unknown SMTP error")
+                    flash(f"User created. Email failed: {err}", "warning")
         except Exception as e:
             flash(f"User created. Email failed: {e}", "warning")
         return redirect(url_for("admin.users"))
     users_list = AdminUser.query.order_by(AdminUser.created_at.desc()).all()
     roles = Role.query.all()
-    return render_template("admin/users.html", users=users_list, roles=roles)
+    mail_info = None
+    try:
+        from app.utils.email import mail_status
+        mail_info = mail_status()
+    except Exception:
+        pass
+    return render_template(
+        "admin/users.html", users=users_list, roles=roles, mail_info=mail_info
+    )
 
 
 @admin_bp.route("/users/<int:id>/toggle", methods=["POST"])
@@ -735,6 +753,23 @@ def user_reset_password(id):
     except Exception as e:
         flash(f"Password reset to: {temp}. Email failed: {e}", "warning")
     log_audit("password_reset", "admin_user", user.id, user.username)
+    return redirect(url_for("admin.users"))
+
+
+@admin_bp.route("/users/<int:id>/delete", methods=["POST"])
+@admin_required
+def user_delete(id):
+    if not current_user.has_role("Super Admin"):
+        abort(403)
+    user = AdminUser.query.get_or_404(id)
+    if user.id == current_user.id:
+        flash("You cannot delete yourself.", "error")
+        return redirect(url_for("admin.users"))
+    uname = user.username
+    db.session.delete(user)
+    db.session.commit()
+    log_audit("deleted", "admin_user", id, uname)
+    flash(f"User {uname} deleted.", "success")
     return redirect(url_for("admin.users"))
 
 
