@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin{% endblock %} — BAM Studio</title>
+  {% set _afav = get_setting('site_favicon', '') or get_setting('site_logo', '') or url_for('static', filename='images/logo.png') %}
+  <link rel="icon" type="image/png" href="{{ _afav }}">
+  <link rel="apple-touch-icon" href="{{ _afav }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=3">
+</head>
+<body class="admin-light">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+        BAM Studio
+      </div>
+      <nav>
+        <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
+        <div class="group">Website</div>
+        <a href="{{ url_for('admin.settings') }}">Homepage / Settings</a>
+        <a href="{{ url_for('admin.clients') }}">Clients / Logos</a>
+        <a href="{{ url_for('admin.testimonials') }}">Testimonials</a>
+        <a href="{{ url_for('admin.faqs') }}">FAQ</a>
+        <a href="{{ url_for('admin.site_stats') }}">Stats</a>
+        <a href="{{ url_for('admin.services') }}">Services</a>
+        <a href="{{ url_for('admin.process_steps') }}">Process</a>
+        <a href="{{ url_for('admin.team_members') }}">Team</a>
+        <div class="group">Portfolio</div>
+        <a href="{{ url_for('admin.projects') }}">Projects</a>
+        <a href="{{ url_for('admin.categories') }}">Categories</a>
+        <a href="{{ url_for('admin.media') }}">Media Library</a>
+        <div class="group">Careers</div>
+        <a href="{{ url_for('admin.careers') }}">Vacancies</a>
+        <a href="{{ url_for('admin.applications') }}">Applications</a>
+        <div class="group">Messages</div>
+        <a href="{{ url_for('admin.inquiries') }}">Inquiries</a>
+        <div class="group">System</div>
+        <a href="{{ url_for('admin.analytics') }}">Analytics</a>
+        <a href="{{ url_for('admin.audit_logs') }}">Audit Logs</a>
+        {% if current_user.has_role('Super Admin') %}
+        <a href="{{ url_for('admin.users') }}">Users</a>
+        {% endif %}
+        <a href="{{ url_for('admin_auth.logout') }}" style="margin-top:1.5rem">Logout</a>
+      </nav>
+    </aside>
+    <div class="admin-main">
+      <header class="admin-header">
+        <div>{% block header %}Admin{% endblock %}</div>
+        <div style="font-size:0.85rem;color:#888">{{ current_user.email if current_user.is_authenticated else '' }}</div>
+      </header>
+      <div class="admin-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

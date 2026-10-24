@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% block title %}Media{% endblock %}
+{% block header %}Media Library{% endblock %}
+{% block content %}
+<p style="color:#6b7280;margin-bottom:1rem;font-size:0.9rem">
+  Upload images here — they appear on the homepage <strong>Behind the work</strong> section only.
+  Edit title / alt text below. Delete removes from the gallery.
+</p>
+<form method="POST" enctype="multipart/form-data" class="form-card" style="margin-bottom:2rem;max-width:480px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label>Upload file *</label><input type="file" name="file" required accept="image/*"></div>
+  <div class="form-group"><label>Title / caption</label><input type="text" name="alt_text" placeholder="Shown as image description"></div>
+  <button type="submit" class="btn btn-primary">Upload to Behind the work</button>
+</form>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem">
+{% for m in pagination.items %}
+<div class="form-card" style="padding:0;overflow:hidden;margin:0">
+  {% if m.url %}
+  <img src="{{ m.url }}" alt="{{ m.alt_text or '' }}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#f8fafc">
+  {% endif %}
+  <div style="padding:0.75rem">
+    <form method="POST" action="{{ url_for('admin.media_edit', id=m.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ m.original_filename or m.filename or '' }}">
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <label>Alt / caption</label>
+        <input type="text" name="alt_text" value="{{ m.alt_text or '' }}">
+      </div>
+      <input type="text" value="{{ m.url }}" readonly onclick="this.select()" style="font-size:0.65rem;margin-bottom:0.5rem">
+      <div style="display:flex;gap:0.35rem">
+        <button type="submit" class="btn btn-primary" style="flex:1">Save</button>
+      </div>
+    </form>
+    <form method="POST" action="{{ url_for('admin.media_delete', id=m.id) }}" onsubmit="return confirm('Remove from Behind the work?')" style="margin-top:0.35rem">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-danger" style="width:100%">Delete</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<p class="empty">No media yet — upload your first image above.</p>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "public/base.html" %}
+{% block title %}{{ service.get_title(current_lang) }} — BAM Studio{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:48vh">
+  <div class="hero-content">
+    <p class="hero-label">{{ service.number }} · {% if current_lang == 'ne' %}सेवा{% else %}Service{% endif %}</p>
+    <h1 style="max-width:16ch">{{ service.get_title(current_lang) }}</h1>
+    <p class="hero-desc">{{ service.get_description(current_lang) }}</p>
+    <div class="hero-actions" style="margin-top:1.5rem">
+      <a href="{{ url_for('public.contact') }}" class="btn btn-primary btn-lg">{% if current_lang == 'ne' %}यस सेवाका लागि सोध्नुहोस्{% else %}Ask about this service{% endif %}</a>
+      <a href="{{ url_for('public.work') }}" class="btn btn-lg">{% if current_lang == 'ne' %}काम हेर्नुहोस्{% else %}See our work{% endif %}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section"><div class="container case-study">
+  {% if service.image %}
+  <div class="case-block" data-reveal>
+    <img src="{{ service.image }}" alt="{{ service.get_title(current_lang) }}" class="service-detail-img">
+  </div>
+  {% endif %}
+
+  <div class="case-grid" data-reveal>
+    <div>
+      <p class="section-label">{% if current_lang == 'ne' %}अवलोकन{% else %}Overview{% endif %}</p>
+      <p class="text-muted" style="font-size:var(--text-lg);line-height:1.7">
+        {{ service.get_description(current_lang) }}
+      </p>
+    </div>
+    <div class="service-side-card">
+      <p class="section-label">{% if current_lang == 'ne' %}समावेश{% else %}Includes{% endif %}</p>
+      <ul class="service-includes">
+        {% if current_lang == 'ne' %}
+        <li>आवश्यकता विश्लेषण</li>
+        <li>डिजाइन / विकास</li>
+        <li>परीक्षण र deployment</li>
+        <li>ह्यान्डओभर र समर्थन विकल्प</li>
+        {% else %}
+        <li>Requirements & discovery</li>
+        <li>Design / development</li>
+        <li>Testing & deployment</li>
+        <li>Handover & support options</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  {% set detail = service.get_detail(current_lang) %}
+  {% if detail %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}पूर्ण विवरण{% else %}Full details{% endif %}</p>
+    <div class="service-detail-body">{{ detail }}</div>
+  </div>
+  {% endif %}
+
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}प्रक्रिया{% else %}How we work{% endif %}</p>
+    <div class="service-process">
+      {% set steps = [
+        ('01', 'Discover', 'खोज'),
+        ('02', 'Plan', 'योजना'),
+        ('03', 'Build', 'निर्माण'),
+        ('04', 'Launch', 'सुरुवात')
+      ] %}
+      {% for num, en, ne in steps %}
+      <div class="service-process-step">
+        <span class="num">{{ num }}</span>
+        <span>{{ ne if current_lang == 'ne' else en }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="case-block service-cta-banner" data-reveal>
+    <div>
+      <h2 style="font-size:var(--text-2xl);margin-bottom:0.5rem">
+        {% if current_lang == 'ne' %}यो सेवा तपाईंको परियोजनासँग मिल्छ?{% else %}Does this fit your project?{% endif %}
+      </h2>
+      <p class="text-muted">
+        {% if current_lang == 'ne' %}
+          छोटो विवरण पठाउनुहोस् — हामी scope र timeline फर्काउँछौं।
+        {% else %}
+          Send a short brief — we will reply with scope and timeline.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('public.contact') }}" class="btn btn-primary btn-lg">
+      {% if current_lang == 'ne' %}सम्पर्क गर्नुहोस्{% else %}Contact us{% endif %}
+    </a>
+  </div>
+</div></section>
+
+{% if others %}
+<section class="section"><div class="container">
+  <p class="section-label">{% if current_lang == 'ne' %}अन्य सेवाहरू{% else %}Other services{% endif %}</p>
+  <div class="services-list">
+    {% for s in others %}
+    <a href="{{ url_for('public.service_detail', id=s.id) }}" class="service-row" data-reveal>
+      <span class="num">{{ s.number }}</span>
+      {% if s.image %}<img src="{{ s.image }}" alt="" class="service-thumb" loading="lazy">{% endif %}
+      <div>
+        <h3>{{ s.get_title(current_lang) }}</h3>
+        <p>{{ s.get_description(current_lang) }}</p>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+{% endblock %}

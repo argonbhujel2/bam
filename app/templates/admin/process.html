@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Process{% endblock %}
+{% block header %}Process Steps{% endblock %}
+{% block content %}
+<form method="POST" class="form-card" style="margin-bottom:2rem;max-width:600px">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-row">
+<div class="form-group"><label>Number</label><input type="text" name="number" value="01"></div>
+<div class="form-group"><label>Order</label><input type="number" name="display_order" value="0"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Title (EN)</label><input type="text" name="title_en" required></div>
+<div class="form-group"><label>Title (NE)</label><input type="text" name="title_ne"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Description (EN)</label><textarea name="description_en"></textarea></div>
+<div class="form-group"><label>Description (NE)</label><textarea name="description_ne"></textarea></div>
+</div>
+<button type="submit" class="btn btn-primary">Add Step</button>
+</form>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>Title</th><th>Order</th></tr></thead>
+<tbody>
+{% for s in steps %}
+<tr><td>{{ s.number }}</td><td>{{ s.title_en }}</td><td>{{ s.display_order }}</td></tr>
+{% else %}<tr><td colspan="3" class="empty">No steps</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

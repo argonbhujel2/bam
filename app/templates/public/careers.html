@@ -1,0 +1,104 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}क्यारियर / खुला पद — BAM Studio{% else %}Careers & Open Positions — BAM Studio{% endif %}{% endblock %}
+{% block meta_description %}{% if current_lang == 'ne' %}BAM Studio मा खुला पदहरू — फुल-स्ट्याक, फ्रन्टएन्ड, ब्याकएन्ड, UI/UX, इन्टर्न। उर्लाबारी, मोरङ, नेपाल।{% else %}Open positions at BAM Studio — Full-Stack, Frontend, Backend, UI/UX, Intern. Urlabari, Morang, Nepal.{% endif %}{% endblock %}
+{% block content %}
+<section class="careers-hero">
+  <div class="container careers-hero-inner">
+    <div>
+      <p class="hero-label">{% if current_lang == 'ne' %}क्यारियर{% else %}Careers{% endif %}</p>
+      <h1>
+        {% if current_lang == 'ne' %}
+          खुला पदहरू — BAM Studio सँग निर्माण गर्नुहोस्
+        {% else %}
+          Open roles — build with BAM Studio
+        {% endif %}
+      </h1>
+      <p class="hero-desc">
+        {% if current_lang == 'ne' %}
+          वास्तविक client product मा काम गर्नुहोस्: वेबसाइट, HMS, ticketing, QR मेनु र business system। उर्लाबारी / हाइब्रिड / रिमोट (नेपाल)।
+        {% else %}
+          Ship real client products — websites, HMS, ticketing, QR menus, and business systems. Urlabari / hybrid / remote (Nepal).
+        {% endif %}
+      </p>
+    </div>
+    <div class="careers-hero-stats" aria-label="Open roles">
+      <div class="chs-item">
+        <span class="chs-num">{{ vacancies|length }}</span>
+        <span class="chs-label">{% if current_lang == 'ne' %}खुला पद{% else %}Open roles{% endif %}</span>
+      </div>
+      <div class="chs-item">
+        <span class="chs-num">NP</span>
+        <span class="chs-label">{% if current_lang == 'ne' %}नेपाल आधारित{% else %}Nepal-based{% endif %}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section careers-section">
+  <div class="container">
+    {% if vacancies %}
+    <div class="careers-grid">
+      {% for v in vacancies %}
+      <article class="vacancy-card" data-reveal>
+        <div class="vacancy-top">
+          <span class="vacancy-dept">{{ v.department or 'BAM Studio' }}</span>
+          <span class="vacancy-type">{{ v.employment_type or 'Full-time' }}</span>
+        </div>
+        <h2 class="vacancy-title">
+          <a href="{{ url_for('public.career_detail', slug=v.slug) }}">{{ v.get_title(current_lang) }}</a>
+        </h2>
+        <p class="vacancy-excerpt">
+          {{ (v.get_description(current_lang) or '')[:160] }}{% if (v.get_description(current_lang) or '')|length > 160 %}…{% endif %}
+        </p>
+        <ul class="vacancy-meta">
+          {% if v.location %}<li>{{ v.location }}</li>{% endif %}
+          {% if v.experience %}<li>{{ v.experience }}</li>{% endif %}
+          {% if v.salary_range %}<li>{{ v.salary_range }}</li>{% endif %}
+        </ul>
+        {% if v.skills %}
+        <div class="vacancy-skills">
+          {% for s in v.skills[:6] %}
+          <span class="skill-chip">{{ s }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="vacancy-actions">
+          <a href="{{ url_for('public.career_detail', slug=v.slug) }}" class="btn btn-primary">
+            {% if current_lang == 'ne' %}विवरण र आवेदन{% else %}View & apply{% endif %} →
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="careers-empty">
+      <p>
+        {% if current_lang == 'ne' %}
+          हाल कुनै खुला पद छैन। चाँडै फेरि जाँच गर्नुहोस् — वा <a href="{{ url_for('public.contact') }}">सम्पर्क</a> गर्नुहोस्।
+        {% else %}
+          No open positions right now. Check back soon — or <a href="{{ url_for('public.contact') }}">get in touch</a>.
+        {% endif %}
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section careers-cta-band">
+  <div class="container careers-cta-inner">
+    <div>
+      <h2>{% if current_lang == 'ne' %}आफ्नो प्रोफाइल पठाउनुहोस्{% else %}Don’t see your role?{% endif %}</h2>
+      <p class="text-muted">
+        {% if current_lang == 'ne' %}
+          हामी सधैं बलियो builder हरू खोज्छौं। आफ्नो CV र portfolio सहित सम्पर्क गर्नुहोस्।
+        {% else %}
+          We’re always open to strong builders. Send your CV and portfolio via contact.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('public.contact') }}" class="btn btn-primary btn-lg">
+      {% if current_lang == 'ne' %}सम्पर्क{% else %}Contact us{% endif %}
+    </a>
+  </div>
+</section>
+{% endblock %}

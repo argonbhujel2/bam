@@ -1,0 +1,41 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}काम — BAM Studio{% else %}Work — BAM Studio{% endif %}{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:40vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}पोर्टफोलियो{% else %}Portfolio{% endif %}</p>
+    <h1>{% if current_lang == 'ne' %}चयनित काम{% else %}Selected Work{% endif %}</h1>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="work-filters" role="group" aria-label="Filter projects">
+      <button type="button" data-category="all" class="{% if active_category == 'all' %}is-active{% endif %}">
+        {% if current_lang == 'ne' %}सबै{% else %}All{% endif %}
+      </button>
+      {% for cat in categories %}
+      <button type="button" data-category="{{ cat.slug }}" class="{% if active_category == cat.slug %}is-active{% endif %}">
+        {{ cat.get_name(current_lang) }}
+      </button>
+      {% endfor %}
+    </div>
+    <div class="work-grid">
+      {% for p in projects %}
+      <a href="{{ url_for('public.project_detail', slug=p.slug) }}" class="work-card" data-reveal>
+        {% if p.cover_image %}
+        <img src="{{ p.cover_image }}" alt="{{ p.title }}" loading="lazy">
+        {% else %}
+        <div class="work-card-placeholder">{{ p.title }}</div>
+        {% endif %}
+        <div class="work-card-overlay">
+          <h3>{{ p.title }}</h3>
+          <span class="cat">{% if p.category %}{{ p.category.get_name(current_lang) }}{% endif %}{% if p.status %} · {{ p.status }}{% endif %}{% if p.project_year %} · {{ p.project_year }}{% endif %}</span>
+        </div>
+      </a>
+      {% else %}
+      <p class="text-muted">{% if current_lang == 'ne' %}परियोजनाहरू चाँडै।{% else %}Projects coming soon.{% endif %}</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

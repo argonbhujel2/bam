@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block title %}Team{% endblock %}
+{% block header %}Team members{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card" style="margin-bottom:2rem;max-width:640px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <div class="form-group"><label>Name *</label><input type="text" name="name" required></div>
+    <div class="form-group"><label>Photo</label><input type="file" name="photo" accept="image/*"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Position (EN)</label><input type="text" name="position_en" placeholder="Full-Stack Developer"></div>
+    <div class="form-group"><label>Position (NE)</label><input type="text" name="position_ne"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Bio (EN)</label><textarea name="bio_en" rows="3"></textarea></div>
+    <div class="form-group"><label>Bio (NE)</label><textarea name="bio_ne" rows="3"></textarea></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Skills (comma separated)</label><input type="text" name="skills" placeholder="Python, Flask, JavaScript"></div>
+    <div class="form-group"><label>Order</label><input type="number" name="display_order" value="0"></div>
+  </div>
+  <label><input type="checkbox" name="is_active" checked> Active (show on About)</label>
+  <hr style="margin:1.25rem 0;border:none;border-top:1px solid #e4e8f0">
+  <label><input type="checkbox" name="create_login"> Also create admin login for this member</label>
+  <div class="form-row" style="margin-top:0.75rem">
+    <div class="form-group"><label>Login email</label><input type="email" name="login_email"></div>
+    <div class="form-group"><label>Login username</label><input type="text" name="login_username"></div>
+  </div>
+  <div class="form-group"><label>Login password</label><input type="password" name="login_password" minlength="8"></div>
+  <button type="submit" class="btn btn-primary" style="margin-top:1rem">Add member</button>
+</form>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Photo</th><th>Name</th><th>Position</th><th>Order</th><th>Active</th><th></th></tr></thead>
+<tbody>
+{% for m in items %}
+<tr>
+  <td>{% if m.profile_image %}<img src="{{ m.profile_image }}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover">{% else %}—{% endif %}</td>
+  <td>{{ m.name }}</td>
+  <td>{{ m.position_en or '—' }}</td>
+  <td>{{ m.display_order }}</td>
+  <td>{{ 'Yes' if m.is_active else 'No' }}</td>
+  <td style="white-space:nowrap">
+    <a href="{{ url_for('admin.team_edit', id=m.id) }}" class="btn">Edit</a>
+    <form method="POST" action="{{ url_for('admin.team_delete', id=m.id) }}" style="display:inline" onsubmit="return confirm('Delete?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="empty">No team members yet</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

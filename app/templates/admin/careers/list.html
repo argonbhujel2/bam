@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block title %}Careers{% endblock %}
+{% block header %}Vacancies{% endblock %}
+{% block content %}
+<div class="actions"><a href="{{ url_for('admin.career_new') }}" class="btn btn-primary">Add Vacancy</a></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Title</th><th>Department</th><th>Status</th><th>Deadline</th><th></th></tr></thead>
+<tbody>
+{% for c in careers %}
+<tr>
+<td>{{ c.title_en }}</td><td>{{ c.department or '—' }}</td>
+<td><span class="badge {% if c.status=='open' %}badge-success{% elif c.status=='closed' %}badge-danger{% else %}badge-warning{% endif %}">{{ c.status }}</span></td>
+<td>{{ c.deadline or '—' }}</td>
+<td>
+<a href="{{ url_for('admin.career_edit', id=c.id) }}" class="btn">Edit</a>
+<form method="POST" action="{{ url_for('admin.career_delete', id=c.id) }}" style="display:inline" onsubmit="return confirm('Delete?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button type="submit" class="btn btn-danger">Delete</button>
+</form>
+</td>
+</tr>
+{% else %}<tr><td colspan="5" class="empty">No vacancies</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

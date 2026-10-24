@@ -1,0 +1,60 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card"><div class="label">Total Projects</div><div class="value">{{ stats.total_projects }}</div></div>
+  <div class="stat-card"><div class="label">Published</div><div class="value">{{ stats.published_projects }}</div></div>
+  <div class="stat-card"><div class="label">Active Services</div><div class="value">{{ stats.active_services }}</div></div>
+  <div class="stat-card"><div class="label">Open Careers</div><div class="value">{{ stats.open_careers }}</div></div>
+  <div class="stat-card"><div class="label">New Applications</div><div class="value">{{ stats.new_applications }}</div></div>
+  <div class="stat-card"><div class="label">New Inquiries</div><div class="value">{{ stats.new_inquiries }}</div></div>
+</div>
+<div class="actions">
+  <a href="{{ url_for('admin.project_new') }}" class="btn btn-primary">Add Project</a>
+  <a href="{{ url_for('admin.service_new') }}" class="btn">Add Service</a>
+  <a href="{{ url_for('admin.career_new') }}" class="btn">Add Career</a>
+  <a href="{{ url_for('admin.applications') }}" class="btn">View Applications</a>
+  <a href="{{ url_for('admin.inquiries') }}" class="btn">View Messages</a>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+  <div>
+    <h3 style="margin-bottom:1rem;font-size:0.9rem;color:#888">Recent Applications</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for a in recent_applications %}
+          <tr>
+            <td><a href="{{ url_for('admin.application_detail', id=a.id) }}">{{ a.full_name }}</a></td>
+            <td><span class="badge">{{ a.status }}</span></td>
+            <td>{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">No applications yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h3 style="margin-bottom:1rem;font-size:0.9rem;color:#888">Recent Inquiries</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Type</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for i in recent_inquiries %}
+          <tr>
+            <td><a href="{{ url_for('admin.inquiry_project_detail', id=i.id) }}">{{ i.name }}</a></td>
+            <td>{{ i.project_type or '—' }}</td>
+            <td>{{ i.created_at.strftime('%Y-%m-%d') if i.created_at else '' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">No inquiries yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

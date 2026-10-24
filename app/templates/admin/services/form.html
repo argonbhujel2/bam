@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if service else 'New' }} Service{% endblock %}
+{% block header %}{{ 'Edit' if service else 'New' }} Service{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-row">
+<div class="form-group"><label>Number</label><input type="text" name="number" value="{{ service.number if service else '01' }}"></div>
+<div class="form-group"><label>Display Order</label><input type="number" name="display_order" value="{{ service.display_order if service else 0 }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Title (EN) *</label><input type="text" name="title_en" value="{{ service.title_en if service else '' }}" required></div>
+<div class="form-group"><label>Title (NE)</label><input type="text" name="title_ne" value="{{ service.title_ne if service else '' }}"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Description (EN)</label><textarea name="description_en">{{ service.description_en if service else '' }}</textarea></div>
+<div class="form-group"><label>Description (NE)</label><textarea name="description_ne">{{ service.description_ne if service else '' }}</textarea></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Detail (EN)</label><textarea name="detail_en">{{ service.detail_en if service else '' }}</textarea></div>
+<div class="form-group"><label>Detail (NE)</label><textarea name="detail_ne">{{ service.detail_ne if service else '' }}</textarea></div>
+</div>
+<div class="form-group" style="display:flex;gap:1.5rem">
+<label><input type="checkbox" name="is_active" {% if not service or service.is_active %}checked{% endif %}> Active</label>
+<label><input type="checkbox" name="is_featured" {% if service and service.is_featured %}checked{% endif %}> Featured</label>
+</div>
+<button type="submit" class="btn btn-primary">Save</button>
+<a href="{{ url_for('admin.services') }}" class="btn">Cancel</a>
+  <div class="form-group"><label>Image (small thumb)</label>
+  {% if service and service.image %}<img src="{{ service.image }}" alt="" style="height:48px;margin-bottom:0.5rem;border-radius:6px"><br>{% endif %}
+  <input type="file" name="image" accept="image/*">
+  <input type="text" name="image_url" value="{{ service.image if service else '' }}" placeholder="Or paste image URL" style="margin-top:0.5rem">
+  </div>
+</form>
+{% endblock %}

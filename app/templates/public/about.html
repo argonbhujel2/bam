@@ -1,0 +1,42 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}हाम्रो बारे{% else %}About{% endif %} — BAM Studio{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:45vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}हाम्रो बारे{% else %}About{% endif %}</p>
+    <h1 style="max-width:16ch">{% if current_lang == 'ne' %}हामी विचारलाई डिजिटल उत्पादनमा रूपान्तरण गर्छौं।{% else %}We turn ideas into digital products.{% endif %}</h1>
+    <p class="hero-desc">{% if current_lang == 'ne' %}BAM Studio ले व्यावहारिक डिजिटल उत्पादन सिर्जना गर्न डिजाइन, प्रविधि र व्यवसाय बुझाइ संयोजन गर्छ।{% else %}BAM Studio combines design, technology and business understanding to create practical digital products.{% endif %}</p>
+    <a href="{{ url_for('public.founder') }}" class="btn" style="margin-top:1rem">{% if current_lang == 'ne' %}संस्थापक — Argon Bhujel{% else %}Meet the founder — Argon Bhujel{% endif %} →</a>
+  </div>
+</section>
+
+<section class="section"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}प्रक्रिया{% else %}Process{% endif %}</p>
+  <div class="process-cinematic">
+    {% for step in process_steps %}
+    <div class="process-step" data-reveal><span class="num">{{ step.number }}</span><div><h3>{{ step.get_title(current_lang) }}</h3><p>{{ step.get_description(current_lang) }}</p></div></div>
+    {% endfor %}
+  </div>
+</div></section>
+
+<section class="section" id="team"><div class="container">
+  <p class="section-label" data-reveal>{% if current_lang == 'ne' %}हाम्रो टोली{% else %}Our team{% endif %}</p>
+  <h2 class="section-title" data-reveal>{% if current_lang == 'ne' %}टोली{% else %}Team{% endif %}</h2>
+  {% if team %}
+  <div class="work-grid">
+    {% for m in team %}
+    <a href="{% if 'argon' in m.name|lower %}{{ url_for('public.founder') }}{% else %}{{ url_for('public.about') }}#member-{{ m.id }}{% endif %}" class="work-card team-card" id="member-{{ m.id }}" data-reveal style="aspect-ratio:3/4">
+      {% if m.profile_image %}<img src="{{ m.profile_image }}" alt="{{ m.name }}" loading="lazy">{% else %}<div class="work-card-placeholder">{{ m.name[:1] }}</div>{% endif %}
+      <div class="work-card-overlay" style="opacity:1">
+        <h3>{{ m.name }}</h3>
+        <span class="cat">{{ m.get_position(current_lang) }}</span>
+        {% if m.get_bio(current_lang) %}<p class="text-sm text-muted" style="margin-top:0.5rem">{{ m.get_bio(current_lang)[:120] }}</p>{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted" data-reveal>{% if current_lang == 'ne' %}टोली विवरण चाँडै।{% else %}Team details coming soon. Meet the founder on the Founder page.{% endif %}</p>
+  {% endif %}
+</div></section>
+{% endblock %}

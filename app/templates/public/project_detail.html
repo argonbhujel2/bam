@@ -1,0 +1,101 @@
+{% extends "public/base.html" %}
+{% block title %}{{ project.title }} — BAM Studio{% endblock %}
+{% block meta_description %}{{ project.get_description(current_lang)[:160] }}{% endblock %}
+{% block content %}
+<section class="project-hero">
+  {% if project.cover_image %}<div class="project-hero-img"><img src="{{ project.cover_image }}" alt="{{ project.title }}"></div>{% endif %}
+  <div class="hero-content" style="position:relative;z-index:2">
+    <p class="hero-label">{% if project.category %}{{ project.category.get_name(current_lang) }}{% endif %}{% if project.status %} · {{ project.status }}{% endif %}</p>
+    <h1 style="font-size:var(--text-4xl)">{{ project.title }}</h1>
+    <p class="hero-desc">{{ project.get_description(current_lang) }}</p>
+    <div class="project-meta">
+      {% if project.client %}<span><strong>{% if current_lang == 'ne' %}ग्राहक{% else %}Client{% endif %}</strong>{{ project.client }}</span>{% endif %}
+      {% if project.location %}<span><strong>{% if current_lang == 'ne' %}स्थान{% else %}Location{% endif %}</strong>{{ project.location }}</span>{% endif %}
+      {% if project.project_year %}<span><strong>{% if current_lang == 'ne' %}वर्ष{% else %}Year{% endif %}</strong>{{ project.project_year }}</span>{% endif %}
+      {% if project.status %}<span><strong>{% if current_lang == 'ne' %}स्थिति{% else %}Status{% endif %}</strong>{{ project.status }}</span>{% endif %}
+      {% if project.technologies %}<span><strong>{% if current_lang == 'ne' %}प्रविधि{% else %}Tech{% endif %}</strong>{{ project.technologies|join(', ') }}</span>{% endif %}
+    </div>
+    <div class="hero-actions" style="margin-top:2rem">
+      {% if project.live_url %}<a href="{{ project.live_url }}" class="btn btn-primary" target="_blank" rel="noopener">{% if current_lang == 'ne' %}लाइभ डेमो{% else %}Live Demo{% endif %} ↗</a>{% endif %}
+      {% if project.github_url %}<a href="{{ project.github_url }}" class="btn" target="_blank" rel="noopener">GitHub ↗</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section"><div class="container case-study">
+  {% if project.get_challenge(current_lang) %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}समस्या{% else %}Problem{% endif %}</p>
+    <p class="text-muted" style="white-space:pre-line;font-size:var(--text-lg)">{{ project.get_challenge(current_lang) }}</p>
+  </div>
+  {% endif %}
+  {% if project.get_solution(current_lang) %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}समाधान{% else %}Solution{% endif %}</p>
+    <p class="text-muted" style="white-space:pre-line;font-size:var(--text-lg)">{{ project.get_solution(current_lang) }}</p>
+  </div>
+  {% endif %}
+  {% if project.get_features(current_lang) %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}विशेषताहरू{% else %}Features{% endif %}</p>
+    <p class="text-muted" style="white-space:pre-line">{{ project.get_features(current_lang) }}</p>
+  </div>
+  {% endif %}
+  {% if project.technologies %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}प्रविधि{% else %}Technology{% endif %}</p>
+    <div class="tech-strip" style="justify-content:flex-start;border:none;padding:0">
+      {% for tech in project.technologies %}<span class="tech-item">{{ tech }}</span>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if project.get_result(current_lang) %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}नतिजा{% else %}Result{% endif %}</p>
+    <p class="text-muted" style="white-space:pre-line;font-size:var(--text-lg)">{{ project.get_result(current_lang) }}</p>
+  </div>
+  {% endif %}
+
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}समयरेखा{% else %}Timeline{% endif %}</p>
+    <div class="timeline">
+      {% if project.project_year %}<div class="timeline-item"><span class="tl-dot"></span><strong>{{ project.project_year }}</strong></div>{% endif %}
+      {% set steps = [('Discovery','खोज'),('UI/UX','UI/UX'),('Development','विकास'),('Testing','परीक्षण'),('Deployment','डिप्लोयमेन्ट'),('Maintenance','मर्मत')] %}
+      {% for en, ne in steps %}
+      <div class="timeline-item"><span class="tl-dot"></span><span>{% if current_lang == 'ne' %}{{ ne }}{% else %}{{ en }}{% endif %}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if project.images %}
+  <div class="case-block" data-reveal>
+    <p class="section-label">{% if current_lang == 'ne' %}स्क्रिनसट{% else %}Screenshots{% endif %}</p>
+    <div class="work-grid">
+      {% for img in project.images %}
+      <div class="work-card"><img src="{{ img.url }}" alt="{{ img.alt_text or project.title }}" loading="lazy"></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if project.live_url %}
+  <div class="case-block" data-reveal style="text-align:center;padding-top:2rem">
+    <a href="{{ project.live_url }}" class="btn btn-primary btn-lg" target="_blank" rel="noopener">{% if current_lang == 'ne' %}लाइभ साइट भ्रमण गर्नुहोस्{% else %}Visit Live Website{% endif %} ↗</a>
+  </div>
+  {% endif %}
+</div></section>
+
+{% if related %}
+<section class="section"><div class="container">
+  <p class="section-label">{% if current_lang == 'ne' %}सम्बन्धित{% else %}Related{% endif %}</p>
+  <div class="work-grid">
+    {% for p in related %}
+    <a href="{{ url_for('public.project_detail', slug=p.slug) }}" class="work-card" data-reveal>
+      {% if p.cover_image %}<img src="{{ p.cover_image }}" alt="{{ p.title }}" loading="lazy">{% else %}<div class="work-card-placeholder">{{ p.title }}</div>{% endif %}
+      <div class="work-card-overlay"><h3>{{ p.title }}</h3></div>
+    </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+{% endblock %}

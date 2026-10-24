@@ -1,0 +1,41 @@
+{% extends "public/base.html" %}
+{% block title %}{% if current_lang == 'ne' %}सेवाहरू — BAM Studio{% else %}Services — BAM Studio{% endif %}{% endblock %}
+{% block content %}
+<section class="hero" style="min-height:45vh">
+  <div class="hero-content">
+    <p class="hero-label">{% if current_lang == 'ne' %}सेवाहरू{% else %}Services{% endif %}</p>
+    <h1 style="max-width:14ch">
+      {% if current_lang == 'ne' %}हामी के निर्माण गर्छौं{% else %}What we build{% endif %}
+    </h1>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="services-list">
+      {% for s in services %}
+      <a href="{{ url_for('public.service_detail', id=s.id) }}" class="service-row" id="service-{{ s.id }}" data-reveal>
+        <span class="num">{{ s.number }}</span>
+        {% if s.image %}<img src="{{ s.image }}" alt="" class="service-thumb" loading="lazy">{% endif %}
+        <div>
+          <h3>{{ s.get_title(current_lang) }}</h3>
+          <p>{{ s.get_description(current_lang) }}</p>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      {% else %}
+      <p class="text-muted">{% if current_lang == 'ne' %}सेवाहरू चाँडै।{% else %}Services coming soon.{% endif %}</p>
+      {% endfor %}
+    </div>
+    {% if stats %}
+    <div class="stats-row" style="margin-top:3.5rem" data-reveal>
+      {% for st in stats %}
+      <div class="stat-block">
+        <div class="stat-value">{{ st.value }}</div>
+        <div class="stat-label">{{ st.get_label(current_lang) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Edit team member{% endblock %}
+{% block header %}Edit team member{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card" style="max-width:640px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label>Name *</label><input type="text" name="name" value="{{ member.name }}" required></div>
+  <div class="form-group">
+    <label>Photo</label>
+    {% if member.profile_image %}<div style="margin-bottom:0.5rem"><img src="{{ member.profile_image }}" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover"></div>{% endif %}
+    <input type="file" name="photo" accept="image/*">
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Position (EN)</label><input type="text" name="position_en" value="{{ member.position_en or '' }}"></div>
+    <div class="form-group"><label>Position (NE)</label><input type="text" name="position_ne" value="{{ member.position_ne or '' }}"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Bio (EN)</label><textarea name="bio_en" rows="3">{{ member.bio_en or '' }}</textarea></div>
+    <div class="form-group"><label>Bio (NE)</label><textarea name="bio_ne" rows="3">{{ member.bio_ne or '' }}</textarea></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Skills (comma)</label><input type="text" name="skills" value="{{ member.skills|join(', ') if member.skills else '' }}"></div>
+    <div class="form-group"><label>Order</label><input type="number" name="display_order" value="{{ member.display_order or 0 }}"></div>
+  </div>
+  <label><input type="checkbox" name="is_active" {% if member.is_active %}checked{% endif %}> Active</label>
+  <div style="margin-top:1rem;display:flex;gap:0.5rem">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('admin.team_members') }}" class="btn">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+{% block title %}Stats{% endblock %}
+{% block header %}Stats (Services page){% endblock %}
+{% block content %}
+<p style="color:#6b7280;margin-bottom:1rem;font-size:0.9rem">
+  These numbers appear on the <strong>Services</strong> page — not on the homepage.
+</p>
+<form method="POST" class="form-card" style="margin-bottom:2rem;max-width:560px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <div class="form-group"><label>Value *</label><input type="text" name="value" placeholder="7+" required></div>
+    <div class="form-group"><label>Order</label><input type="number" name="display_order" value="0"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Label (EN) *</label><input type="text" name="label_en" placeholder="Projects Delivered" required></div>
+    <div class="form-group"><label>Label (NE)</label><input type="text" name="label_ne" placeholder="डेलिभर परियोजनाहरू"></div>
+  </div>
+  <label><input type="checkbox" name="is_active" checked> Active</label>
+  <button type="submit" class="btn btn-primary" style="margin-top:1rem">Add stat</button>
+</form>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Value</th><th>Label EN</th><th>Label NE</th><th>Order</th><th>Active</th><th></th></tr></thead>
+<tbody>
+{% for i in items %}
+<tr>
+  <td colspan="6" style="padding:0.75rem">
+    <form method="POST" action="{{ url_for('admin.stat_edit', id=i.id) }}" style="display:grid;grid-template-columns:80px 1fr 1fr 70px 80px auto;gap:0.5rem;align-items:center">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" name="value" value="{{ i.value }}">
+      <input type="text" name="label_en" value="{{ i.label_en }}">
+      <input type="text" name="label_ne" value="{{ i.label_ne or '' }}">
+      <input type="number" name="display_order" value="{{ i.display_order or 0 }}">
+      <label style="margin:0"><input type="checkbox" name="is_active" {% if i.is_active %}checked{% endif %}> On</label>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+    <form method="POST" action="{{ url_for('admin.stat_delete', id=i.id) }}" onsubmit="return confirm('Delete?')" style="margin-top:0.35rem">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="empty">No stats</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

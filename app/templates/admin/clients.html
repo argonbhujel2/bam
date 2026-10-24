@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}Clients{% endblock %}
+{% block header %}Clients / Logo wall{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="form-card" style="margin-bottom:2rem;max-width:560px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label>Name *</label><input type="text" name="name" required></div>
+  <div class="form-group"><label>Logo (PNG/SVG/JPG — Cloudinary or local)</label><input type="file" name="logo" accept="image/*"></div>
+  <div class="form-group"><label>Website URL</label><input type="url" name="website_url" placeholder="https://"></div>
+  <div class="form-group"><label>Display order</label><input type="number" name="display_order" value="0"></div>
+  <label><input type="checkbox" name="is_active" checked> Active</label>
+  <button type="submit" class="btn btn-primary" style="margin-top:1rem">Add client</button>
+</form>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Logo</th><th>Name</th><th>Website</th><th>Order</th><th></th></tr></thead>
+<tbody>
+{% for c in items %}
+<tr>
+  <td>{% if c.logo_url %}<img src="{{ c.logo_url }}" alt="" style="height:40px;max-width:100px;object-fit:contain;background:#fff;padding:4px;border-radius:4px">{% else %}—{% endif %}</td>
+  <td>{{ c.name }}</td>
+  <td>{% if c.website_url %}<a href="{{ c.website_url }}" target="_blank">Link</a>{% else %}—{% endif %}</td>
+  <td>{{ c.display_order }}</td>
+  <td style="white-space:nowrap">
+    <a href="{{ url_for('admin.client_edit', id=c.id) }}" class="btn">Edit</a>
+    <form method="POST" action="{{ url_for('admin.client_delete', id=c.id) }}" onsubmit="return confirm('Delete?')" style="display:inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="5" class="empty">No clients yet — add logos here for the homepage wall</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

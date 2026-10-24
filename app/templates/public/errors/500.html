@@ -1,0 +1,10 @@
+{% extends "public/base.html" %}
+{% block title %}500 — BAM Studio{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="code">500</div>
+  <h1>{% if current_lang == 'ne' %}केहि गलत भयो{% else %}Something went wrong{% endif %}</h1>
+  <p>{% if current_lang == 'ne' %}हामी समस्या समाधान गर्दैछौं। कृपया पछि प्रयास गर्नुहोस्।{% else %}We're working on it. Please try again later.{% endif %}</p>
+  <a href="{{ url_for('public.home') }}" class="btn btn-primary">{% if current_lang == 'ne' %}गृहपृष्ठ{% else %}Go Home{% endif %}</a>
+</div>
+{% endblock %}

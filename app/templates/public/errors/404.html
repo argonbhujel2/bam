@@ -1,0 +1,10 @@
+{% extends "public/base.html" %}
+{% block title %}404 — BAM Studio{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="code">404</div>
+  <h1>{% if current_lang == 'ne' %}पृष्ठ फेला परेन{% else %}Page not found{% endif %}</h1>
+  <p>{% if current_lang == 'ne' %}तपाईंले खोज्नुभएको पृष्ठ अवस्थित छैन।{% else %}The page you're looking for doesn't exist.{% endif %}</p>
+  <a href="{{ url_for('public.home') }}" class="btn btn-primary">{% if current_lang == 'ne' %}गृहपृष्ठ{% else %}Go Home{% endif %}</a>
+</div>
+{% endblock %}

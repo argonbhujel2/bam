@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}FAQ{% endblock %}
+{% block header %}FAQ{% endblock %}
+{% block content %}
+<form method="POST" class="form-card" style="margin-bottom:2rem;max-width:640px">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-row">
+<div class="form-group"><label>Question (EN)</label><input type="text" name="question_en" required></div>
+<div class="form-group"><label>Question (NE)</label><input type="text" name="question_ne"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Answer (EN)</label><textarea name="answer_en"></textarea></div>
+<div class="form-group"><label>Answer (NE)</label><textarea name="answer_ne"></textarea></div>
+</div>
+<div class="form-group"><label>Order</label><input type="number" name="display_order" value="0"></div>
+<button type="submit" class="btn btn-primary">Add FAQ</button>
+</form>
+<div class="table-wrap"><table>
+<thead><tr><th>Question</th><th>Order</th><th></th></tr></thead>
+<tbody>
+{% for i in items %}
+<tr><td>{{ i.question_en }}</td><td>{{ i.display_order }}</td>
+<td><form method="POST" action="{{ url_for('admin.faq_delete', id=i.id) }}" onsubmit="return confirm('Delete?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger">Delete</button></form></td></tr>
+{% else %}<tr><td colspan="3" class="empty">No FAQs</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

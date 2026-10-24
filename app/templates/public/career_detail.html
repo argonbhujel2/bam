@@ -1,0 +1,119 @@
+{% extends "public/base.html" %}
+{% block title %}{{ career.get_title(current_lang) }} — {% if current_lang == 'ne' %}क्यारियर{% else %}Careers{% endif %} — BAM Studio{% endblock %}
+{% block meta_description %}{{ (career.get_description(current_lang) or career.get_title(current_lang))[:160] }}{% endblock %}
+{% block content %}
+<section class="career-detail-hero">
+  <div class="container">
+    <p class="breadcrumb">
+      <a href="{{ url_for('public.careers') }}">{% if current_lang == 'ne' %}क्यारियर{% else %}Careers{% endif %}</a>
+      <span>/</span>
+      <span>{{ career.get_title(current_lang) }}</span>
+    </p>
+    <div class="career-detail-head">
+      <div>
+        <span class="vacancy-dept">{{ career.department or 'BAM Studio' }}</span>
+        <h1>{{ career.get_title(current_lang) }}</h1>
+        <ul class="vacancy-meta career-detail-meta">
+          {% if career.location %}<li>{{ career.location }}</li>{% endif %}
+          {% if career.employment_type %}<li>{{ career.employment_type }}</li>{% endif %}
+          {% if career.experience %}<li>{{ career.experience }}</li>{% endif %}
+          {% if career.salary_range %}<li>{{ career.salary_range }}</li>{% endif %}
+          {% if career.deadline %}<li>{% if current_lang == 'ne' %}अन्तिम मिति{% else %}Deadline{% endif %}: {{ career.deadline.strftime('%Y-%m-%d') }}</li>{% endif %}
+        </ul>
+        {% if career.skills %}
+        <div class="vacancy-skills" style="margin-top:1rem">
+          {% for s in career.skills %}
+          <span class="skill-chip">{{ s }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <a href="#apply" class="btn btn-primary btn-lg">
+        {% if current_lang == 'ne' %}आवेदन दिनुहोस्{% else %}Apply now{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container career-detail-grid">
+    <div class="career-detail-body">
+      {% if career.get_description(current_lang) %}
+      <div class="career-block" data-reveal>
+        <h2>{% if current_lang == 'ne' %}विवरण{% else %}About the role{% endif %}</h2>
+        <p class="text-muted pre-line">{{ career.get_description(current_lang) }}</p>
+      </div>
+      {% endif %}
+      {% if career.get_responsibilities(current_lang) %}
+      <div class="career-block" data-reveal>
+        <h2>{% if current_lang == 'ne' %}जिम्मेवारीहरू{% else %}Responsibilities{% endif %}</h2>
+        <p class="text-muted pre-line">{{ career.get_responsibilities(current_lang) }}</p>
+      </div>
+      {% endif %}
+      {% if career.get_requirements(current_lang) %}
+      <div class="career-block" data-reveal>
+        <h2>{% if current_lang == 'ne' %}आवश्यकताहरू{% else %}Requirements{% endif %}</h2>
+        <p class="text-muted pre-line">{{ career.get_requirements(current_lang) }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <aside class="career-apply-panel" id="apply" data-reveal>
+      <h2>{% if current_lang == 'ne' %}आवेदन दिनुहोस्{% else %}Apply for this role{% endif %}</h2>
+      <p class="text-muted" style="font-size:var(--text-sm);margin-bottom:1.25rem">
+        {% if current_lang == 'ne' %}
+          CV (PDF/Word) अपलोड गर्नुहोस्। हामी छिटो review गर्छौं।
+        {% else %}
+          Upload your CV (PDF/Word). We’ll review applications promptly.
+        {% endif %}
+      </p>
+      <form method="POST" enctype="multipart/form-data" class="career-apply-form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          <label>{{ form.full_name.label }}</label>
+          {{ form.full_name(required=True) }}
+        </div>
+        <div class="form-group">
+          <label>{{ form.email.label }}</label>
+          {{ form.email(required=True) }}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ form.phone.label }}</label>
+            {{ form.phone() }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.experience.label }}</label>
+            {{ form.experience() }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ form.portfolio.label }}</label>
+          {{ form.portfolio(placeholder='https://') }}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ form.github.label }}</label>
+            {{ form.github(placeholder='https://github.com/') }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.linkedin.label }}</label>
+            {{ form.linkedin(placeholder='https://linkedin.com/in/') }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ form.cv.label }} (PDF / Word)</label>
+          {{ form.cv() }}
+        </div>
+        <div class="form-group">
+          <label>{{ form.cover_message.label }}</label>
+          {{ form.cover_message(rows=4) }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%">
+          {% if current_lang == 'ne' %}आवेदन पेश गर्नुहोस्{% else %}Submit application{% endif %}
+        </button>
+      </form>
+    </aside>
+  </div>
+</section>
+{% endblock %}

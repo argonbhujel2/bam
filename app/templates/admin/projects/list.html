@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% block title %}Projects{% endblock %}
+{% block header %}Projects{% endblock %}
+{% block content %}
+<div class="actions">
+  <a href="{{ url_for('admin.project_new') }}" class="btn btn-primary">Add Project</a>
+  <form method="GET" style="display:inline-flex;gap:0.5rem">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search…" style="padding:0.5rem;background:#1c1c1c;border:1px solid rgba(255,255,255,0.08);color:#fff;border-radius:3px">
+    <button type="submit" class="btn">Search</button>
+  </form>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Title</th><th>Category</th><th>Status</th><th>Featured</th><th>Order</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in pagination.items %}
+      <tr>
+        <td>{{ p.title }}</td>
+        <td>{{ p.category.name_en if p.category else '—' }}</td>
+        <td><span class="badge {% if p.is_published %}badge-success{% else %}badge-warning{% endif %}">{{ 'Published' if p.is_published else 'Draft' }}</span></td>
+        <td>{{ 'Yes' if p.is_featured else '—' }}</td>
+        <td>{{ p.display_order }}</td>
+        <td>
+          <a href="{{ url_for('admin.project_edit', id=p.id) }}" class="btn">Edit</a>
+          <form method="POST" action="{{ url_for('admin.project_delete', id=p.id) }}" style="display:inline" onsubmit="return confirm('Delete this project?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No projects yet</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<div style="margin-top:1rem;display:flex;gap:0.5rem">
+  {% if pagination.has_prev %}<a href="?page={{ pagination.prev_num }}&q={{ q }}" class="btn">Prev</a>{% endif %}
+  <span style="padding:0.5rem">{{ pagination.page }} / {{ pagination.pages }}</span>
+  {% if pagination.has_next %}<a href="?page={{ pagination.next_num }}&q={{ q }}" class="btn">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

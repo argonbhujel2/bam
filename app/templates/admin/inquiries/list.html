@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Inquiries{% endblock %}
+{% block header %}Inquiries{% endblock %}
+{% block content %}
+<div class="actions">
+<a href="?tab=project" class="btn {% if tab=='project' %}btn-primary{% endif %}">Project Inquiries</a>
+<a href="?tab=contact" class="btn {% if tab=='contact' %}btn-primary{% endif %}">Contact Messages</a>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Name</th><th>Email</th><th>{% if tab=='project' %}Type{% else %}Subject{% endif %}</th><th>Status</th><th>Date</th><th></th></tr></thead>
+<tbody>
+{% for i in items %}
+<tr>
+<td>{{ i.name }}</td><td>{{ i.email }}</td>
+<td>{% if tab=='project' %}{{ i.project_type or '—' }}{% else %}{{ i.subject or '—' }}{% endif %}</td>
+<td><span class="badge">{{ i.status }}</span></td>
+<td>{{ i.created_at.strftime('%Y-%m-%d') if i.created_at else '' }}</td>
+<td>
+{% if tab=='project' %}
+<a href="{{ url_for('admin.inquiry_project_detail', id=i.id) }}" class="btn">View</a>
+{% else %}
+<a href="{{ url_for('admin.inquiry_contact_detail', id=i.id) }}" class="btn">View</a>
+{% endif %}
+</td>
+</tr>
+{% else %}<tr><td colspan="6" class="empty">No items</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

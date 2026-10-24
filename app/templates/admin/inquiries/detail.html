@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Inquiry{% endblock %}
+{% block header %}{{ kind|title }} Inquiry — {{ item.name }}{% endblock %}
+{% block content %}
+<div class="form-card">
+<p><strong>Email:</strong> {{ item.email }}</p>
+<p><strong>Phone:</strong> {{ item.phone or '—' }}</p>
+{% if kind == 'project' %}
+<p><strong>Company:</strong> {{ item.company or '—' }}</p>
+<p><strong>Project type:</strong> {{ item.project_type or '—' }}</p>
+<p><strong>Budget:</strong> {{ item.budget or '—' }}</p>
+{% else %}
+<p><strong>Subject:</strong> {{ item.subject or '—' }}</p>
+{% endif %}
+<p><strong>Message:</strong></p>
+<p style="white-space:pre-line;color:#aaa">{{ item.message }}</p>
+<form method="POST" style="margin-top:1.5rem">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-group">
+<label>Status</label>
+<select name="status">
+{% for s in ['new','contacted','in_discussion','converted','closed'] %}
+<option value="{{ s }}" {% if item.status==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="form-group">
+<label>Internal notes</label>
+<textarea name="internal_notes">{{ item.internal_notes or '' }}</textarea>
+</div>
+<button type="submit" class="btn btn-primary">Update</button>
+<a href="{{ url_for('admin.inquiries') }}" class="btn">Back</a>
+</form>
+</div>
+{% endblock %}
