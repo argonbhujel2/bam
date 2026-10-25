@@ -11,14 +11,14 @@ load_dotenv()  # also allow CWD override
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
-    # Database: Postgres (Neon/Layerbase) OR Turso (libSQL)
+    # Database: prefer Postgres on Vercel. Turso only if dialect installs cleanly.
     SQLALCHEMY_DATABASE_URI = (os.environ.get("DATABASE_URL") or "sqlite:///bamstudio.db").strip()
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
     }
 
-    # Postgres
+    # Normalize Postgres
     if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://", 1
@@ -27,45 +27,56 @@ class Config:
         sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + sep + "sslmode=require"
 
-    # Turso — official SQLAlchemy pattern (embedded replica in /tmp for serverless)
-    # Env: TURSO_DATABASE_URL=libsql://xxx.turso.io  +  TURSO_AUTH_TOKEN=eyJ...
+    # Strip broken libsql URLs from DATABASE_URL (would crash without dialect)
+    if SQLALCHEMY_DATABASE_URI.startswith("libsql://") or SQLALCHEMY_DATABASE_URI.startswith(
+        "sqlite+libsql://"
+    ):
+        SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/bamstudio-fallback.db"
+
+    # Optional Turso — ONLY if sqlalchemy_libsql dialect is importable
     _turso = (os.environ.get("TURSO_DATABASE_URL") or "").strip()
     _turso_token = (os.environ.get("TURSO_AUTH_TOKEN") or "").strip()
-    if not _turso and SQLALCHEMY_DATABASE_URI.startswith("libsql://"):
-        _turso = SQLALCHEMY_DATABASE_URI
-        SQLALCHEMY_DATABASE_URI = "sqlite:///bamstudio.db"
+    _turso_ok = False
     if _turso and _turso_token:
-        # Register dialect (required on some hosts)
         try:
             import sqlalchemy_libsql  # noqa: F401
-        except ImportError:
-            pass
-        # Normalize sync URL
-        sync_url = _turso
-        if sync_url.startswith("https://"):
-            sync_url = "libsql://" + sync_url.replace("https://", "").split("/")[0]
-        elif not sync_url.startswith("libsql://"):
-            sync_url = "libsql://" + sync_url.split("?")[0]
-        # Strip token from URL if pasted into TURSO_DATABASE_URL
-        if "?" in sync_url:
-            base, qs = sync_url.split("?", 1)
-            sync_url = base
-            for part in qs.split("&"):
-                if part.startswith("authToken="):
-                    _turso_token = part.split("=", 1)[-1]
-        # Vercel: only /tmp is writable
-        SQLALCHEMY_DATABASE_URI = "sqlite+libsql:////tmp/bamstudio-turso.db"
-        SQLALCHEMY_ENGINE_OPTIONS = {
-            "connect_args": {
-                "auth_token": _turso_token,
-                "sync_url": sync_url,
-            },
-            "pool_pre_ping": True,
-            "pool_recycle": 300,
-        }
-    elif SQLALCHEMY_DATABASE_URI.startswith("libsql://") or SQLALCHEMY_DATABASE_URI.startswith("sqlite+libsql://"):
-        # Incomplete Turso config — fall back so the app still boots
-        SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/bamstudio-fallback.db"
+            _turso_ok = True
+        except Exception:
+            _turso_ok = False
+        if _turso_ok:
+            sync_url = _turso
+            if sync_url.startswith("https://"):
+                sync_url = "libsql://" + sync_url.replace("https://", "").split("/")[0]
+            elif not sync_url.startswith("libsql://"):
+                sync_url = "libsql://" + sync_url.split("?")[0]
+            if "?" in sync_url:
+                base, qs = sync_url.split("?", 1)
+                sync_url = base
+                for part in qs.split("&"):
+                    if part.startswith("authToken="):
+                        _turso_token = part.split("=", 1)[-1]
+            SQLALCHEMY_DATABASE_URI = "sqlite+libsql:////tmp/bamstudio-turso.db"
+            SQLALCHEMY_ENGINE_OPTIONS = {
+                "connect_args": {
+                    "auth_token": _turso_token,
+                    "sync_url": sync_url,
+                },
+                "pool_pre_ping": True,
+                "pool_recycle": 300,
+            }
+        else:
+            # Dialect missing on this host (common on Vercel) — keep Postgres/sqlite
+            import logging
+            logging.getLogger("bamstudio").warning(
+                "TURSO_* set but sqlalchemy_libsql not available; using DATABASE_URL instead"
+            )
+
+    # Serverless: never use relative sqlite path under /var/task
+    if SQLALCHEMY_DATABASE_URI.startswith("sqlite:///") and not SQLALCHEMY_DATABASE_URI.startswith(
+        "sqlite:////tmp"
+    ):
+        if "libsql" not in SQLALCHEMY_DATABASE_URI:
+            SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/bamstudio.db"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

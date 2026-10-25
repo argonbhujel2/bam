@@ -48,11 +48,6 @@ def create_app(config_name=None):
         except OSError:
             pass
 
-    # Register Turso dialect if installed (sqlite+libsql://)
-    try:
-        import sqlalchemy_libsql  # noqa: F401
-    except ImportError:
-        pass
     db.init_app(flask_app)
     migrate.init_app(flask_app, db)
     login_manager.init_app(flask_app)

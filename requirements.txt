@@ -22,6 +22,11 @@ python-slugify==8.0.4
 requests==2.32.3
 
 # Turso / libSQL (Linux — works on Vercel)
-sqlalchemy-libsql==0.2.0
-libsql-experimental>=0.0.53
 greenlet>=3.0.3
+
+# Turso is optional. On Vercel the libsql dialect often fails to load.
+# Prefer DATABASE_URL=postgresql://... (Neon/Supabase/Layerbase).
+# To try Turso later, uncomment:
+# sqlalchemy-libsql==0.2.0
+# libsql-experimental>=0.0.53
+# greenlet>=3.0.3
