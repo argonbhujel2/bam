@@ -11,18 +11,44 @@ load_dotenv()  # also allow CWD override
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "sqlite:///bamstudio.db"
-    )
-    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URI = (os.environ.get("DATABASE_URL") or "sqlite:///bamstudio.db").strip()
+    # Postgres (Neon, Layerbase, etc.)
+    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://", 1
         )
-    # Neon / managed Postgres: ensure SSL
-    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgresql"):
-        if "sslmode=" not in SQLALCHEMY_DATABASE_URI:
-            sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
-            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + sep + "sslmode=require"
+    if SQLALCHEMY_DATABASE_URI.startswith("postgresql") and "sslmode=" not in SQLALCHEMY_DATABASE_URI:
+        sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + sep + "sslmode=require"
+    # Turso (libSQL) — set DATABASE_URL=libsql://<db>-<org>.turso.io?authToken=<token>
+    # or TURSO_DATABASE_URL + TURSO_AUTH_TOKEN
+    _turso = (os.environ.get("TURSO_DATABASE_URL") or "").strip()
+    _turso_token = (os.environ.get("TURSO_AUTH_TOKEN") or "").strip()
+    if _turso:
+        # Accept libsql://host or https://host.turso.io
+        host = (
+            _turso.replace("libsql://", "")
+            .replace("https://", "")
+            .split("?")[0]
+            .split("/")[0]
+        )
+        SQLALCHEMY_DATABASE_URI = f"sqlite+libsql://{host}?secure=true"
+        token = _turso_token
+        if "authToken=" in _turso:
+            # extract token from URL if present
+            for part in _turso.split("?", 1)[-1].split("&"):
+                if part.startswith("authToken="):
+                    token = part.split("=", 1)[-1]
+                    break
+        if token:
+            SQLALCHEMY_DATABASE_URI += f"&authToken={token}"
+    elif SQLALCHEMY_DATABASE_URI.startswith("libsql://"):
+        host_part = SQLALCHEMY_DATABASE_URI[len("libsql://") :]
+        SQLALCHEMY_DATABASE_URI = "sqlite+libsql://" + host_part
+        if "secure=" not in SQLALCHEMY_DATABASE_URI:
+            SQLALCHEMY_DATABASE_URI += (
+                "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
+            ) + "secure=true"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,

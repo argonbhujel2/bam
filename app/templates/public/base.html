@@ -131,14 +131,20 @@
         <div>
           <h4>{% if current_lang == 'ne' %}सामाजिक{% else %}Social{% endif %}</h4>
           <div class="footer-links">
-            {% set fb = get_setting('facebook') %}
-            {% set ig = get_setting('instagram') %}
-            {% set li = get_setting('linkedin') %}
-            {% set gh = get_setting('github') %}
+            {% set fb = get_setting('facebook', 'https://www.facebook.com/argon017/') %}
+            {% set ig = get_setting('instagram', 'https://www.instagram.com/argon_bhujel_017') %}
+            {% set tt = get_setting('tiktok', 'https://www.tiktok.com/@argon.bhujel') %}
+            {% set yt = get_setting('youtube', 'https://www.youtube.com/@Argan_017') %}
+            {% set th = get_setting('threads', 'https://www.threads.com/@argon_bhujel_017') %}
+            {% set wa = get_setting('whatsapp', 'https://wa.me/9779712031505') %}
+            {% set lt = get_setting('linktree', 'https://linktr.ee/bamstudio017') %}
             {% if fb %}<a href="{{ fb }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
             {% if ig %}<a href="{{ ig }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
-            {% if li %}<a href="{{ li }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
-            {% if gh %}<a href="{{ gh }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
+            {% if tt %}<a href="{{ tt }}" target="_blank" rel="noopener">TikTok</a>{% endif %}
+            {% if yt %}<a href="{{ yt }}" target="_blank" rel="noopener">YouTube</a>{% endif %}
+            {% if th %}<a href="{{ th }}" target="_blank" rel="noopener">Threads</a>{% endif %}
+            {% if wa %}<a href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
+            {% if lt %}<a href="{{ lt }}" target="_blank" rel="noopener">Linktree</a>{% endif %}
           </div>
         </div>
       </div>

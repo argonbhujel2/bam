@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <rect width="240" height="240" rx="48" fill="#1d4ed8"/>
+  <text x="120" y="128" text-anchor="middle" font-family="system-ui,sans-serif" font-size="64" font-weight="700" fill="#fff">NV</text>
+  <text x="120" y="180" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="600" fill="#fff" opacity="0.9">New Vision Academy</text>
+</svg>

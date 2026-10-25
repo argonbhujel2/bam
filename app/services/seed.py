@@ -43,6 +43,13 @@ def seed_settings():
         ("hero_desc", "Websites, systems and digital solutions engineered for modern businesses.", "आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।", "homepage"),
         ("footer_description", "We design and build digital experiences that move businesses forward.", "हामी डिजिटल अनुभव डिजाइन र निर्माण गर्छौं जसले व्यवसायलाई अगाडि बढाउँछ।", "footer"),
         ("copyright", "© BAM Studio — All Rights Reserved.", "© BAM Studio — सर्वाधिकार सुरक्षित।", "footer"),
+        ("instagram", "https://www.instagram.com/argon_bhujel_017", None, "social"),
+        ("facebook", "https://www.facebook.com/argon017/", None, "social"),
+        ("tiktok", "https://www.tiktok.com/@argon.bhujel", None, "social"),
+        ("youtube", "https://www.youtube.com/@Argan_017", None, "social"),
+        ("threads", "https://www.threads.com/@argon_bhujel_017", None, "social"),
+        ("whatsapp", "https://wa.me/9779712031505", None, "social"),
+        ("linktree", "https://linktr.ee/bamstudio017", None, "social"),
         ("seo_default_title", "BAM Studio — Digital Experiences. Engineered.", None, "seo"),
         ("seo_default_description", "BAM Studio designs and builds websites, custom software, business systems and digital solutions. Web development company in Urlabari, Morang, Nepal.", None, "seo"),
         ("seo_keywords", 'BAM Studio, BAM Studio Nepal, BAM Studio Urlabari, Web Development Company Nepal, Web Development Company Morang, Website Development Nepal, Website Design Nepal, Web Designer Nepal, Full Stack Developer Nepal, Custom Website Development Nepal, Web Development in Urlabari, Website Design in Urlabari, Web Development Company in Urlabari, Website Developer in Urlabari, Web Design in Morang, Web Development in Morang, Website Developer in Morang, Web Development in Damak, Website Design in Damak, Web Development in Pathari, Website Design in Pathari, Web Developer in Jhapa, Web Developer in Koshi Province, Custom Web Development, Business Website Development, Hotel Website Development, School Website Development, Football Club Website, Sports Website Development, Event Ticketing Website, Hotel Management System, HMS Development Nepal, Restaurant QR Ordering System, QR Menu Development, Booking System Development, Online Ticketing System, Admin Dashboard Development, CMS Development, Flask Web Development, Python Web Development, PostgreSQL Web Development, UI/UX Design Nepal, Football Website Development Nepal, Football Club Website Nepal, Sports Website Design Nepal, Football Tournament Website, Football Ticketing System Nepal, Gold Cup Ticketing System, Hotel Management System Nepal, Hotel Booking Website Nepal, School Website Development Nepal, School Management Website Nepal, Business Website Development Morang, नेपालमा वेबसाइट बनाउने कम्पनी, नेपालमा वेबसाइट डेभलपमेन्ट, वेबसाइट डिजाइन नेपाल, वेबसाइट बनाउने कम्पनी नेपाल, उर्लाबारीमा वेबसाइट बनाउने, मोरङमा वेबसाइट डेभलपर, दमकमा वेबसाइट बनाउने, पथरीमा वेबसाइट डिजाइन, होटल वेबसाइट बनाउने, स्कुल वेबसाइट बनाउने, अनलाइन टिकटिङ सिस्टम, होटल म्यानेजमेन्ट सिस्टम, QR मेनु सिस्टम', None, "seo"),
@@ -250,27 +257,95 @@ def seed_sample_projects():
             "display_order": 2,
         },
         {
-            "title": "Leaf Letang Enterprises",
-            "slug": "leaf-letang-enterprises",
-            "description_en": "Website for Leaf Letang Enterprises — sustainable leaf products from Nepal.",
-            "description_ne": "Leaf Letang Enterprises को वेबसाइट — नेपालबाट दिगो पातजन्य उत्पादनहरू।",
-            "full_description_en": "Digital presence for Leaf Letang Enterprises, highlighting sustainable leaf-based products sourced from Nepal.",
-            "client": "Leaf Letang Enterprises",
+            "title": "Mega Hotel Website",
+            "slug": "mega-hotel-website",
+            "description_en": "Official website for Mega Hotel — rooms, dining and digital presence.",
+            "description_ne": "Mega Hotel को आधिकारिक वेबसाइट — कोठा, डाइनिङ र डिजिटल उपस्थिति।",
+            "full_description_en": "Marketing website for Mega Hotel with service overview, visuals and contact paths for guests.",
+            "full_description_ne": "Mega Hotel का लागि marketing वेबसाइट — सेवा, visuals र contact।",
+            "client": "Mega Hotel",
             "location": "Nepal",
-            "category": business if business else websites,
-            "technologies": ["HTML", "CSS", "JavaScript", "Vercel"],
-            "cover_image": "/static/images/projects/leaf-letang.jpg",
-            "live_url": "https://leafltg.vercel.app/",
+            "category": websites,
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "cover_image": "/static/images/clients/mega-hotel.svg",
+            "live_url": "https://linktr.ee/bamstudio017",
             "project_year": "2025",
             "status": "Live",
-            "challenge_en": "Leaf Letang Enterprises needed a digital presence for sustainable leaf products from Nepal.",
-            "solution_en": "Built a clean product-focused website deployed on Vercel.",
-            "features_en": "Product storytelling\nResponsive design\nFast deployment",
-            "result_en": "Live site at leafltg.vercel.app.",
+            "challenge_en": "Mega Hotel needed a clear web presence for guests and food delivery visibility.",
+            "solution_en": "Built a responsive hotel website and linked digital channels.",
+            "features_en": "Responsive site\nService overview\nContact paths",
+            "result_en": "Live digital presence for Mega Hotel.",
             "is_featured": True,
             "is_published": True,
             "display_order": 3,
         },
+        {
+            "title": "Mega Hotel Android App",
+            "slug": "mega-hotel-android-app",
+            "description_en": "Android food delivery / ordering app experience for Mega Hotel guests.",
+            "description_ne": "Mega Hotel अतिथिहरूका लागि Android food delivery / ordering app।",
+            "full_description_en": "Mobile app workflow for Mega Hotel food ordering and guest convenience on Android.",
+            "client": "Mega Hotel",
+            "location": "Nepal",
+            "category": systems if systems else websites,
+            "technologies": ["Android", "JavaScript", "API"],
+            "cover_image": "/static/images/clients/mega-hotel.svg",
+            "live_url": None,
+            "project_year": "2025",
+            "status": "Live",
+            "challenge_en": "Guests needed a simple mobile path to order food from Mega Hotel.",
+            "solution_en": "Designed and delivered an Android app flow for food delivery ordering.",
+            "features_en": "Android app\nFood ordering flow\nGuest-friendly UI",
+            "result_en": "Android app available for Mega Hotel food delivery.",
+            "is_featured": True,
+            "is_published": True,
+            "display_order": 4,
+        },
+        {
+            "title": "Urlabari Interior Decor",
+            "slug": "urlabari-interior-decor",
+            "description_en": "Website for Urlabari Interior Decor — gypsum, ceiling and interior solutions in Nepal.",
+            "description_ne": "Urlabari Interior Decor को वेबसाइट — नेपालमा gypsum, ceiling र interior समाधान।",
+            "full_description_en": "Official site for Urlabari Interior Decor showcasing products, projects and service requests.",
+            "client": "Urlabari Interior Decor",
+            "location": "Urlabari, Morang, Nepal",
+            "category": business if business else websites,
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "cover_image": "/static/images/clients/urlabari-interior.svg",
+            "live_url": "https://www.urlabariinterior.com.np/",
+            "project_year": "2025",
+            "status": "Live",
+            "challenge_en": "Urlabari Interior Decor needed a professional web presence for gypsum and ceiling services.",
+            "solution_en": "Built a product and project showcase website with inquiry paths.",
+            "features_en": "Product catalogue\nProject gallery\nService requests",
+            "result_en": "Live at urlabariinterior.com.np.",
+            "is_featured": True,
+            "is_published": True,
+            "display_order": 5,
+        },
+        {
+            "title": "Urlabari Interior Decor HMS",
+            "slug": "urlabari-interior-hms",
+            "description_en": "Management system (HMS-style ops) for Urlabari Interior Decor — jobs, clients and operations.",
+            "description_ne": "Urlabari Interior Decor का लागि व्यवस्थापन प्रणाली — काम, ग्राहक र सञ्चालन।",
+            "full_description_en": "Operational system for Urlabari Interior Decor to track work, clients and day-to-day business flow.",
+            "client": "Urlabari Interior Decor",
+            "location": "Urlabari, Morang, Nepal",
+            "category": systems if systems else websites,
+            "technologies": ["Python", "Flask", "PostgreSQL"],
+            "cover_image": "/static/images/clients/urlabari-interior.svg",
+            "live_url": None,
+            "project_year": "2025",
+            "status": "Live",
+            "challenge_en": "Interior business operations needed structured digital tracking beyond spreadsheets.",
+            "solution_en": "Delivered a custom management system tailored to Urlabari Interior Decor workflows.",
+            "features_en": "Client records\nJob tracking\nOperational dashboard",
+            "result_en": "Live internal management system for Urlabari Interior Decor.",
+            "is_featured": True,
+            "is_published": True,
+            "display_order": 6,
+        },
+
         {
             "title": "New Vision Academy",
             "slug": "new-vision-academy",
@@ -521,19 +596,33 @@ def seed_admin():
 
 
 def seed_clients():
+    """Featured clients shown on the site (no Leaf Letang)."""
     from app.models import Client
-    names = [
-        ("Hotel Grand", "https://hotelgrand.com.np/", 0),
-        ("Leaf Letang Enterprises", "https://leafltg.vercel.app/", 1),
-        ("New Vision Academy", "https://www.newvisionacademy.com.np/", 2),
-        ("Pathari Sanischare Gold Cup", "https://ticketpathrigc.argan.com.np/", 3),
-        ("Pathari-11 FC", "https://pathri11fc.argan.com.np/", 4),
-        ("Jhapa FC", "https://jhapacityfc.vercel.app/", 5),
+    clients = [
+        ("Mega Hotel", "https://linktr.ee/bamstudio017", 0, "/static/images/clients/mega-hotel.svg"),
+        ("Urlabari Interior Decor", "https://www.urlabariinterior.com.np/", 1, "/static/images/clients/urlabari-interior.svg"),
+        ("Hotel Grand", "https://hotelgrand.com.np/", 2, "/static/images/clients/hotel-grand.svg"),
+        ("New Vision Academy", None, 3, "/static/images/clients/new-vision-academy.svg"),
+        ("Gold Cup / Jhapa Football", None, 4, "/static/images/clients/gold-cup.svg"),
+        ("Jhapa FC", None, 5, "/static/images/clients/jhapa-fc.svg"),
     ]
-    for name, url, order in names:
-        if not Client.query.filter_by(name=name).first():
-            db.session.add(Client(name=name, website_url=url, display_order=order, is_active=True))
+    for name, url, order, logo in clients:
+        c = Client.query.filter_by(name=name).first()
+        if not c:
+            c = Client(name=name, website_url=url, display_order=order, logo_url=logo, is_active=True)
+            db.session.add(c)
+        else:
+            c.website_url = url or c.website_url
+            c.logo_url = logo or c.logo_url
+            c.display_order = order
+            c.is_active = True
+    # Deactivate removed clients (e.g. Leaf Letang)
+    for gone in ("Leaf Letang Enterprises", "Leaf Letang"):
+        c = Client.query.filter_by(name=gone).first()
+        if c:
+            c.is_active = False
     db.session.commit()
+
 
 
 def seed_careers():
