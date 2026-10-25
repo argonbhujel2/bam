@@ -20,5 +20,8 @@ Jinja2==3.1.4
 bleach==6.2.0
 python-slugify==8.0.4
 requests==2.32.3
-# Turso / libSQL
-sqlalchemy-libsql>=0.1.0
+
+# Turso / libSQL (Linux — works on Vercel)
+sqlalchemy-libsql==0.2.0
+libsql-experimental>=0.0.53
+greenlet>=3.0.3

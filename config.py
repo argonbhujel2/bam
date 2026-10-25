@@ -11,8 +11,14 @@ load_dotenv()  # also allow CWD override
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+    # Database: Postgres (Neon/Layerbase) OR Turso (libSQL)
     SQLALCHEMY_DATABASE_URI = (os.environ.get("DATABASE_URL") or "sqlite:///bamstudio.db").strip()
-    # Postgres (Neon, Layerbase, etc.)
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
+
+    # Postgres
     if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://", 1
@@ -20,40 +26,48 @@ class Config:
     if SQLALCHEMY_DATABASE_URI.startswith("postgresql") and "sslmode=" not in SQLALCHEMY_DATABASE_URI:
         sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI + sep + "sslmode=require"
-    # Turso (libSQL) — set DATABASE_URL=libsql://<db>-<org>.turso.io?authToken=<token>
-    # or TURSO_DATABASE_URL + TURSO_AUTH_TOKEN
+
+    # Turso — official SQLAlchemy pattern (embedded replica in /tmp for serverless)
+    # Env: TURSO_DATABASE_URL=libsql://xxx.turso.io  +  TURSO_AUTH_TOKEN=eyJ...
     _turso = (os.environ.get("TURSO_DATABASE_URL") or "").strip()
     _turso_token = (os.environ.get("TURSO_AUTH_TOKEN") or "").strip()
-    if _turso:
-        # Accept libsql://host or https://host.turso.io
-        host = (
-            _turso.replace("libsql://", "")
-            .replace("https://", "")
-            .split("?")[0]
-            .split("/")[0]
-        )
-        SQLALCHEMY_DATABASE_URI = f"sqlite+libsql://{host}?secure=true"
-        token = _turso_token
-        if "authToken=" in _turso:
-            # extract token from URL if present
-            for part in _turso.split("?", 1)[-1].split("&"):
+    if not _turso and SQLALCHEMY_DATABASE_URI.startswith("libsql://"):
+        _turso = SQLALCHEMY_DATABASE_URI
+        SQLALCHEMY_DATABASE_URI = "sqlite:///bamstudio.db"
+    if _turso and _turso_token:
+        # Register dialect (required on some hosts)
+        try:
+            import sqlalchemy_libsql  # noqa: F401
+        except ImportError:
+            pass
+        # Normalize sync URL
+        sync_url = _turso
+        if sync_url.startswith("https://"):
+            sync_url = "libsql://" + sync_url.replace("https://", "").split("/")[0]
+        elif not sync_url.startswith("libsql://"):
+            sync_url = "libsql://" + sync_url.split("?")[0]
+        # Strip token from URL if pasted into TURSO_DATABASE_URL
+        if "?" in sync_url:
+            base, qs = sync_url.split("?", 1)
+            sync_url = base
+            for part in qs.split("&"):
                 if part.startswith("authToken="):
-                    token = part.split("=", 1)[-1]
-                    break
-        if token:
-            SQLALCHEMY_DATABASE_URI += f"&authToken={token}"
-    elif SQLALCHEMY_DATABASE_URI.startswith("libsql://"):
-        host_part = SQLALCHEMY_DATABASE_URI[len("libsql://") :]
-        SQLALCHEMY_DATABASE_URI = "sqlite+libsql://" + host_part
-        if "secure=" not in SQLALCHEMY_DATABASE_URI:
-            SQLALCHEMY_DATABASE_URI += (
-                "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
-            ) + "secure=true"
+                    _turso_token = part.split("=", 1)[-1]
+        # Vercel: only /tmp is writable
+        SQLALCHEMY_DATABASE_URI = "sqlite+libsql:////tmp/bamstudio-turso.db"
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "connect_args": {
+                "auth_token": _turso_token,
+                "sync_url": sync_url,
+            },
+            "pool_pre_ping": True,
+            "pool_recycle": 300,
+        }
+    elif SQLALCHEMY_DATABASE_URI.startswith("libsql://") or SQLALCHEMY_DATABASE_URI.startswith("sqlite+libsql://"):
+        # Incomplete Turso config — fall back so the app still boots
+        SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/bamstudio-fallback.db"
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,
-        "pool_recycle": 300,
-    }
 
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False") == "True"
