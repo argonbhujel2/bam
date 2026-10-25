@@ -39,7 +39,7 @@ def seed_settings():
         ("email", "hello@bamstudio.com", None, "general"),
         ("phone", "+977-XXXXXXXX", None, "general"),
         ("address", "Nepal", None, "general"),
-        ("hero_heading", "WE BUILD DIGITAL EXPERIENCES.", "हामी डिजिटल अनुभव निर्माण गर्छौं।", "homepage"),
+        ("hero_heading", "Digital Experiences. Engineered.", "हामी डिजिटल अनुभव निर्माण गर्छौं।", "homepage"),
         ("hero_desc", "Websites, systems and digital solutions engineered for modern businesses.", "आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।", "homepage"),
         ("footer_description", "We design and build digital experiences that move businesses forward.", "हामी डिजिटल अनुभव डिजाइन र निर्माण गर्छौं जसले व्यवसायलाई अगाडि बढाउँछ।", "footer"),
         ("copyright", "© BAM Studio — All Rights Reserved.", "© BAM Studio — सर्वाधिकार सुरक्षित।", "footer"),

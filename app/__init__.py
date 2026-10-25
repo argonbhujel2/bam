@@ -260,10 +260,14 @@ def create_app(config_name=None):
                 if hh:
                     en = (hh.value_en or "").strip()
                     ne = (hh.value_ne or "").strip()
+                    if en.upper().startswith("WE BUILD"):
+                        hh.value_en = "Digital Experiences. Engineered."
+                        _db.session.commit()
+                        en = hh.value_en
                     if en and _devanagari.search(en) and (not ne or ne == en):
                         # EN field has Nepali — move to NE, restore English default
                         hh.value_ne = en
-                        hh.value_en = "WE BUILD DIGITAL EXPERIENCES."
+                        hh.value_en = "Digital Experiences. Engineered."
                         _db.session.commit()
                     elif en and _devanagari.search(en) and ne and not _devanagari.search(ne):
                         # EN and NE swapped

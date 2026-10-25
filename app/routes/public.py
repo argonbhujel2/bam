@@ -167,7 +167,7 @@ def home():
 
     # Always read EN and NE columns explicitly (never use current UI language here)
     from app.models import SiteSetting
-    _default_heading_en = "WE BUILD DIGITAL EXPERIENCES."
+    _default_heading_en = "Digital Experiences. Engineered."
     _default_heading_ne = "हामी डिजिटल अनुभव निर्माण गर्छौं।"
     _default_desc_en = "Websites, systems and digital solutions engineered for modern businesses."
     _default_desc_ne = "आधुनिक व्यवसायका लागि वेबसाइट, प्रणाली तथा डिजिटल समाधान निर्माण गर्छौं।"

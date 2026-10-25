@@ -5,9 +5,20 @@
 <section class="hero hero--text">
   <div class="hero-content">
     <p class="hero-label">BAM Studio</p>
-    <h1>{% if current_lang == 'ne' %}{{ hero.heading_ne }}{% else %}{{ hero.heading_en }}{% endif %}</h1>
+    <h1 class="hero-title">
+      {% if current_lang == 'ne' %}
+        {{ hero.heading_ne }}
+      {% else %}
+        {% set h = hero.heading_en %}
+        {% if h and h|length < 80 %}
+          {{ h }}
+        {% else %}
+          Digital Experiences.<br>Engineered.
+        {% endif %}
+      {% endif %}
+    </h1>
     <p class="hero-desc">{% if current_lang == 'ne' %}{{ hero.desc_ne }}{% else %}{{ hero.desc_en }}{% endif %}</p>
-    <p class="text-muted text-sm" style="margin-bottom:1.5rem;max-width:42ch">
+    <p class="hero-tagline">
       {% if current_lang == 'ne' %}म वेबसाइट मात्र डिजाइन गर्दिनँ। म तिनका पछाडिका प्रणालीहरू निर्माण गर्छु।{% else %}I don't just design websites. I build the systems behind them.{% endif %}
     </p>
     <div class="hero-actions">
