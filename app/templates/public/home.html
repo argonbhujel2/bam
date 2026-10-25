@@ -2,11 +2,7 @@
 {% block title %}BAM Studio — {% if current_lang == 'ne' %}डिजिटल अनुभव। ईन्जिनियर गरिएको।{% else %}Digital Experiences. Engineered.{% endif %}{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <div class="hero-media" aria-hidden="true">
-    {% set hero_bg = get_setting('hero_bg_image', '') %}
-    <img src="{{ hero_bg if hero_bg else url_for('static', filename='images/hero/hero-bg.jpg') }}" alt="" loading="eager">
-  </div>
+<section class="hero hero--text">
   <div class="hero-content">
     <p class="hero-label">BAM Studio</p>
     <h1>{% if current_lang == 'ne' %}{{ hero.heading_ne }}{% else %}{{ hero.heading_en }}{% endif %}</h1>

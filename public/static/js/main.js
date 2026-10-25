@@ -8,12 +8,17 @@
 
   function initLoader() {
     const loader = document.querySelector(".loader");
-    if (!loader) return;
-    const hide = () => loader.classList.add("is-done");
+    const finish = () => {
+      document.body.classList.add("is-loaded");
+      if (loader) loader.classList.add("is-done");
+    };
+    const delay = prefersReduced ? 0 : 320;
     if (document.readyState === "complete") {
-      setTimeout(hide, prefersReduced ? 0 : 700);
+      setTimeout(finish, delay);
     } else {
-      window.addEventListener("load", () => setTimeout(hide, prefersReduced ? 0 : 700));
+      window.addEventListener("load", () => setTimeout(finish, delay));
+      // safety: never block more than 1.2s
+      setTimeout(finish, 1200);
     }
   }
 

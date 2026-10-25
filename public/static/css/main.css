@@ -1239,3 +1239,151 @@ body { background: var(--color-bg); color: var(--color-text); }
     filter: none !important;
   }
 }
+
+
+/* hero no-image + loader v21 */
+.hero-media { display: none !important; }
+.hero--text {
+  min-height: min(92vh, 900px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: calc(var(--nav-height) + 3rem) 0 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero--text .hero-content {
+  width: var(--container);
+  margin-inline: auto;
+  max-width: 18ch;
+  position: relative;
+  z-index: 2;
+}
+.hero--text .hero-content h1 {
+  max-width: 12ch;
+}
+.hero--text .hero-desc {
+  max-width: 36ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  line-height: 1.55;
+}
+.hero--text .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.hero--text .hero-scroll {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--color-text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.hero--text .hero-scroll span {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  animation: scrollLine 1.6s ease-in-out infinite;
+}
+@keyframes scrollLine {
+  0% { transform: scaleY(0.3); opacity: 0.3; transform-origin: top; }
+  50% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.3); opacity: 0.3; transform-origin: bottom; }
+}
+
+/* Clean, fast page open */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.45s step-end;
+}
+.loader.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0s linear 0.45s;
+}
+.loader-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  animation: loaderIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.loader-mark img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  animation: none !important;
+  opacity: 0.95;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 0 32px rgba(34, 211, 238, 0.15);
+}
+.loader-mark span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  opacity: 0.9;
+}
+.loader-mark::after {
+  content: "";
+  width: 48px;
+  height: 2px;
+  margin-top: 0.35rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  background-size: 200% 100%;
+  animation: loaderBar 0.9s ease-in-out infinite;
+}
+@keyframes loaderIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes loaderBar {
+  0% { background-position: 100% 0; opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { background-position: -100% 0; opacity: 0.4; }
+}
+
+/* Hero content entrance after load */
+body:not(.is-loaded) .hero--text .hero-content > * {
+  opacity: 0;
+  transform: translateY(18px);
+}
+body.is-loaded .hero--text .hero-content > * {
+  animation: heroRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+body.is-loaded .hero--text .hero-content > *:nth-child(1) { animation-delay: 0.05s; }
+body.is-loaded .hero--text .hero-content > *:nth-child(2) { animation-delay: 0.12s; }
+body.is-loaded .hero--text .hero-content > *:nth-child(3) { animation-delay: 0.18s; }
+body.is-loaded .hero--text .hero-content > *:nth-child(4) { animation-delay: 0.24s; }
+body.is-loaded .hero--text .hero-content > *:nth-child(5) { animation-delay: 0.3s; }
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-mark::after, .hero--text .hero-scroll span { animation: none; }
+  body.is-loaded .hero--text .hero-content > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
