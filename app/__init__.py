@@ -75,11 +75,22 @@ def create_app(config_name=None):
 
     @flask_app.before_request
     def set_language():
-        lang = request.args.get("lang") or request.cookies.get("lang") or session.get("lang")
-        if lang not in ("en", "ne"):
-            lang = flask_app.config.get("DEFAULT_LANGUAGE", "en")
-        g.lang = lang
-        session["lang"] = lang
+        try:
+            lang = (
+                request.args.get("lang")
+                or request.cookies.get("lang")
+                or session.get("lang")
+                or flask_app.config.get("DEFAULT_LANGUAGE", "en")
+            )
+            if lang not in ("en", "ne"):
+                lang = "en"
+            g.lang = lang
+            try:
+                session["lang"] = lang
+            except Exception:
+                pass
+        except Exception:
+            g.lang = "en"
 
     @flask_app.context_processor
     def inject_globals():

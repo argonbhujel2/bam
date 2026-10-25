@@ -117,7 +117,9 @@ def set_language(lang):
 # ── Home ───────────────────────────────────────────────────────────────
 @public_bp.route("/")
 def home():
-    lang = g.lang
+    lang = getattr(g, "lang", None) or request.cookies.get("lang") or "en"
+    if lang not in ("en", "ne"):
+        lang = "en"
     services = (
         Service.query.filter_by(is_active=True)
         .order_by(Service.display_order)
