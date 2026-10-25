@@ -19,7 +19,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=12">
   {% block head %}{% endblock %}
   <script type="application/ld+json">
@@ -138,6 +138,7 @@
             {% set th = get_setting('threads', 'https://www.threads.com/@argon_bhujel_017') %}
             {% set wa = get_setting('whatsapp', 'https://wa.me/9779712031505') %}
             {% set lt = get_setting('linktree', 'https://linktr.ee/bamstudio017') %}
+            {% set gh = get_setting('github', 'https://github.com/argonbhujel1/') %}
             {% if fb %}<a href="{{ fb }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
             {% if ig %}<a href="{{ ig }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
             {% if tt %}<a href="{{ tt }}" target="_blank" rel="noopener">TikTok</a>{% endif %}
@@ -145,6 +146,7 @@
             {% if th %}<a href="{{ th }}" target="_blank" rel="noopener">Threads</a>{% endif %}
             {% if wa %}<a href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
             {% if lt %}<a href="{{ lt }}" target="_blank" rel="noopener">Linktree</a>{% endif %}
+            {% if gh %}<a href="{{ gh }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
           </div>
         </div>
       </div>

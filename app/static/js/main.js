@@ -164,7 +164,21 @@
     });
   }
 
+  
+  function initSpotlight() {
+    if (prefersReduced || window.matchMedia("(pointer: coarse)").matches) return;
+    const spot = document.createElement("div");
+    spot.setAttribute("aria-hidden", "true");
+    spot.style.cssText = "pointer-events:none;position:fixed;inset:0;z-index:0;opacity:0.4;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(34,211,238,0.07),transparent 40%);transition:opacity .3s";
+    document.body.appendChild(spot);
+    window.addEventListener("pointermove", (e) => {
+      document.documentElement.style.setProperty("--mx", e.clientX + "px");
+      document.documentElement.style.setProperty("--my", e.clientY + "px");
+    }, { passive: true });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    initSpotlight();
     initLoader();
     initNav();
     initReveal();

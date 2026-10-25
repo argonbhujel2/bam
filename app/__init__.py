@@ -275,6 +275,23 @@ def create_app(config_name=None):
                     _db.session.rollback()
                 except Exception:
                     pass
+            # Ensure GitHub link
+            try:
+                from app.models import SiteSetting
+                from app import db as _db
+                g = SiteSetting.query.filter_by(key="github").first()
+                if not g:
+                    _db.session.add(SiteSetting(key="github", value_en="https://github.com/argonbhujel1/", group="social"))
+                    _db.session.commit()
+                elif not (g.value_en or "").strip() or g.value_en.strip() in ("https://github.com", "https://github.com/"):
+                    g.value_en = "https://github.com/argonbhujel1/"
+                    _db.session.commit()
+            except Exception:
+                try:
+                    from app import db as _db
+                    _db.session.rollback()
+                except Exception:
+                    pass
             # Ensure SEO keywords setting exists (updates empty only)
             try:
                 from app.models import SiteSetting
