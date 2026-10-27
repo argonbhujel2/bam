@@ -20,6 +20,7 @@
         <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
         <div class="group">Website</div>
         <a href="{{ url_for('admin.settings') }}">Homepage / Settings</a>
+        <a href="{{ url_for('admin.notices') }}">Notices</a>
         <a href="{{ url_for('admin.clients') }}">Clients / Logos</a>
         <a href="{{ url_for('admin.testimonials') }}">Testimonials</a>
         <a href="{{ url_for('admin.faqs') }}">FAQ</a>

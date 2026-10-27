@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=12">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=13">
   {% block head %}{% endblock %}
   <script type="application/ld+json">
   {
@@ -32,6 +32,81 @@
     "founder": { "@type": "Person", "name": "Argon Bhujel" }
   }
   </script>
+
+  <style>
+    .notice-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.25rem;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .notice-overlay.is-visible {
+      opacity: 1; visibility: visible;
+    }
+    .notice-modal {
+      background: #111; color: #f5f5f5;
+      border: 1px solid rgba(201,162,39,0.35);
+      border-radius: 16px;
+      max-width: 440px; width: 100%;
+      padding: 1.75rem 1.5rem 1.25rem;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      transform: translateY(12px) scale(0.98);
+      transition: transform 0.35s ease;
+      position: relative;
+    }
+    .notice-overlay.is-visible .notice-modal {
+      transform: translateY(0) scale(1);
+    }
+    .notice-modal h3 {
+      font-family: Syne, Manrope, sans-serif;
+      font-size: 1.25rem; font-weight: 700;
+      margin: 0 0 0.75rem; color: #f5f5f5;
+      letter-spacing: -0.02em;
+    }
+    .notice-modal p {
+      margin: 0 0 1.25rem; line-height: 1.55;
+      color: #c8c8c8; font-size: 0.95rem;
+      white-space: pre-line;
+    }
+    .notice-actions {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      align-items: center; justify-content: flex-end;
+    }
+    .notice-actions a, .notice-actions button {
+      font-family: Manrope, sans-serif;
+      font-size: 0.875rem; font-weight: 600;
+      border-radius: 999px; padding: 0.5rem 1.1rem;
+      cursor: pointer; border: none;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .notice-cta {
+      background: #c9a227; color: #111;
+      text-decoration: none;
+    }
+    .notice-cta:hover { opacity: 0.9; }
+    .notice-skip {
+      background: transparent; color: #aaa;
+      border: 1px solid #444 !important;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .notice-skip.is-ready {
+      opacity: 1; pointer-events: auto;
+    }
+    .notice-skip:hover { color: #fff; border-color: #666 !important; }
+    .notice-progress {
+      position: absolute; left: 0; bottom: 0; height: 3px;
+      background: #c9a227; border-radius: 0 0 16px 16px;
+      width: 100%; transform-origin: left;
+      animation: notice-shrink 10s linear forwards;
+    }
+    @keyframes notice-shrink {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+  </style>
 </head>
 <body>
   <div class="loader" aria-hidden="true">
@@ -98,7 +173,27 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer" role="contentinfo">
+  
+  {% if active_notice %}
+  <div class="notice-overlay" id="noticeOverlay" role="dialog" aria-modal="true" aria-labelledby="noticeTitle" hidden>
+    <div class="notice-modal">
+      <h3 id="noticeTitle">{{ active_notice.get_title(current_lang) }}</h3>
+      {% set _body = active_notice.get_body(current_lang) %}
+      {% if _body %}<p>{{ _body }}</p>{% endif %}
+      <div class="notice-actions">
+        {% if active_notice.link_url %}
+        <a class="notice-cta" href="{{ active_notice.link_url }}" target="_blank" rel="noopener">{{ active_notice.get_link_label(current_lang) }}</a>
+        {% endif %}
+        <button type="button" class="notice-skip" id="noticeSkip" aria-label="Skip">
+          {% if current_lang == 'ne' %}छोड्नुहोस्{% else %}Skip{% endif %}
+        </button>
+      </div>
+      <div class="notice-progress" id="noticeProgress"></div>
+    </div>
+  </div>
+  {% endif %}
+
+<footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-top">
         <div class="footer-brand">
@@ -165,7 +260,58 @@
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=12" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=13" defer></script>
+  
+  {% if active_notice %}
+  <script>
+  (function () {
+    var key = "bam_notice_seen_{{ active_notice.id }}";
+    try {
+      if (localStorage.getItem(key) === "1") return;
+    } catch (e) {}
+
+    var overlay = document.getElementById("noticeOverlay");
+    var skipBtn = document.getElementById("noticeSkip");
+    if (!overlay) return;
+
+    overlay.hidden = false;
+    // next frame so transition runs
+    requestAnimationFrame(function () {
+      overlay.classList.add("is-visible");
+    });
+
+    var closed = false;
+    function closeNotice() {
+      if (closed) return;
+      closed = true;
+      overlay.classList.remove("is-visible");
+      setTimeout(function () {
+        overlay.hidden = true;
+      }, 350);
+      try { localStorage.setItem(key, "1"); } catch (e) {}
+    }
+
+    // Enable skip after 5s
+    setTimeout(function () {
+      if (skipBtn) skipBtn.classList.add("is-ready");
+    }, 5000);
+
+    // Auto close after 10s
+    setTimeout(closeNotice, 10000);
+
+    if (skipBtn) {
+      skipBtn.addEventListener("click", closeNotice);
+    }
+    // Click outside also closes after skip is ready
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay && skipBtn && skipBtn.classList.contains("is-ready")) {
+        closeNotice();
+      }
+    });
+  })();
+  </script>
+  {% endif %}
+
   {% block scripts %}{% endblock %}
 </body>
 </html>

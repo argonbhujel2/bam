@@ -110,8 +110,10 @@ def create_app(config_name=None):
             except Exception:
                 return default
 
+        active_notice = None
         try:
-            from app.models import NavigationItem
+            from app.models import NavigationItem, Notice
+            from datetime import datetime
             nav_items = (
                 NavigationItem.query.filter_by(is_active=True, parent_id=None)
                 .order_by(NavigationItem.display_order)
@@ -119,6 +121,17 @@ def create_app(config_name=None):
             )
             site_name = safe_get_setting("site_name", site_name)
             site_tagline = safe_get_setting("site_tagline", site_tagline)
+            # Latest published notice that is currently in its date window
+            now = datetime.utcnow()
+            q = Notice.query.filter_by(is_active=True)
+            candidates = q.order_by(Notice.created_at.desc()).limit(5).all()
+            for n in candidates:
+                if n.starts_at and now < n.starts_at:
+                    continue
+                if n.ends_at and now > n.ends_at:
+                    continue
+                active_notice = n
+                break
         except Exception:
             pass
 
@@ -128,6 +141,7 @@ def create_app(config_name=None):
             "get_setting": safe_get_setting,
             "site_name": site_name,
             "site_tagline": site_tagline,
+            "active_notice": active_notice,
         }
 
     from app.routes.public import public_bp

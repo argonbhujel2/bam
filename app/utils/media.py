@@ -106,3 +106,27 @@ def delete_from_cloudinary(public_id, resource_type="image"):
     except Exception as e:
         current_app.logger.error(f"Cloudinary delete error: {e}")
         return False
+
+
+def cloudinary_download_url(url, filename=None):
+    """Force download for Cloudinary (esp. raw PDF/DOC) via fl_attachment.
+    Falls back to original URL if not a Cloudinary URL.
+    """
+    if not url:
+        return url
+    if "res.cloudinary.com" not in url and "cloudinary.com" not in url:
+        return url
+    # Insert fl_attachment after /upload/
+    # e.g. .../raw/upload/v123/foo.pdf  ->  .../raw/upload/fl_attachment/v123/foo.pdf
+    # or with filename: fl_attachment:myfile.pdf
+    marker = "/upload/"
+    if marker not in url:
+        return url
+    left, right = url.split(marker, 1)
+    flag = "fl_attachment"
+    if filename:
+        # sanitize for Cloudinary attachment name
+        safe = "".join(c if c.isalnum() or c in ".-_" else "_" for c in filename)
+        if safe:
+            flag = f"fl_attachment:{safe}"
+    return f"{left}{marker}{flag}/{right}"

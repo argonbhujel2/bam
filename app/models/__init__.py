@@ -11,6 +11,7 @@ from app.models.content import (
     TechItem,
     StatItem,
     Client,
+    Notice,
 )
 from app.models.project import Project, ProjectCategory, ProjectImage
 from app.models.career import Career, CareerApplication
@@ -34,6 +35,7 @@ __all__ = [
     "TechItem",
     "StatItem",
     "Client",
+    "Notice",
     "Project",
     "ProjectCategory",
     "ProjectImage",

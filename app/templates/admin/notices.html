@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+{% block title %}Notices{% endblock %}
+{% block header %}Notices / Announcements{% endblock %}
+{% block content %}
+<p style="color:#888;margin-bottom:1.25rem;font-size:0.9rem">
+  Active notice is shown as a popup on the public site when a visitor opens any page.
+  It displays for 10 seconds; after 5 seconds visitors can skip it.
+</p>
+
+<form method="POST" class="form-card" style="margin-bottom:2rem;max-width:720px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <div class="form-group"><label>Title (EN) *</label><input type="text" name="title_en" required placeholder="Important update"></div>
+    <div class="form-group"><label>Title (NE)</label><input type="text" name="title_ne" placeholder="महत्वपूर्ण अपडेट"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Body (EN)</label><textarea name="body_en" rows="3" placeholder="Short message shown in the popup…"></textarea></div>
+    <div class="form-group"><label>Body (NE)</label><textarea name="body_ne" rows="3"></textarea></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>CTA Link URL (optional)</label><input type="url" name="link_url" placeholder="https://…"></div>
+    <div class="form-group"><label>CTA Label (EN)</label><input type="text" name="link_label_en" placeholder="Learn more"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>CTA Label (NE)</label><input type="text" name="link_label_ne"></div>
+    <div class="form-group"><label>Start (UTC, optional)</label><input type="datetime-local" name="starts_at"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>End (UTC, optional)</label><input type="datetime-local" name="ends_at"></div>
+    <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:0.4rem">
+      <label style="display:flex;gap:0.5rem;align-items:center;cursor:pointer">
+        <input type="checkbox" name="is_active" value="1"> Publish now (makes this the active notice)
+      </label>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Create Notice</button>
+</form>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in items %}
+      <tr>
+        <td>
+          <strong>{{ i.title_en }}</strong>
+          {% if i.body_en %}<div style="font-size:0.85rem;color:#888;margin-top:0.25rem">{{ i.body_en[:120] }}{% if i.body_en|length > 120 %}…{% endif %}</div>{% endif %}
+        </td>
+        <td>
+          {% if i.is_active %}
+            <span style="color:#16a34a;font-weight:600">Active</span>
+          {% else %}
+            <span style="color:#888">Inactive</span>
+          {% endif %}
+        </td>
+        <td style="font-size:0.85rem;color:#888">{{ i.created_at.strftime('%Y-%m-%d %H:%M') if i.created_at else '—' }}</td>
+        <td style="white-space:nowrap">
+          <form method="POST" action="{{ url_for('admin.notice_toggle', id=i.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn" type="submit">{% if i.is_active %}Unpublish{% else %}Publish{% endif %}</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.notice_delete', id=i.id) }}" style="display:inline" onsubmit="return confirm('Delete this notice?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">No notices yet. Create one above.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

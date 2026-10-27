@@ -296,3 +296,53 @@ class Client(db.Model):
 
     def __repr__(self):
         return f"<Client {self.name}>"
+
+
+class Notice(db.Model):
+    """Site-wide notice / announcement popup shown on public pages."""
+    __tablename__ = "notices"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title_en = db.Column(db.String(200), nullable=False)
+    title_ne = db.Column(db.String(200))
+    body_en = db.Column(db.Text)
+    body_ne = db.Column(db.Text)
+    link_url = db.Column(db.String(500))  # optional CTA link
+    link_label_en = db.Column(db.String(80))
+    link_label_ne = db.Column(db.String(80))
+    is_active = db.Column(db.Boolean, default=False, index=True)
+    starts_at = db.Column(db.DateTime)
+    ends_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    def get_title(self, lang="en"):
+        if lang == "ne" and self.title_ne:
+            return self.title_ne
+        return self.title_en
+
+    def get_body(self, lang="en"):
+        if lang == "ne" and self.body_ne:
+            return self.body_ne
+        return self.body_en or ""
+
+    def get_link_label(self, lang="en"):
+        if lang == "ne" and self.link_label_ne:
+            return self.link_label_ne
+        return self.link_label_en or "Learn more"
+
+    @property
+    def is_currently_active(self):
+        if not self.is_active:
+            return False
+        now = datetime.utcnow()
+        if self.starts_at and now < self.starts_at:
+            return False
+        if self.ends_at and now > self.ends_at:
+            return False
+        return True
+
+    def __repr__(self):
+        return f"<Notice {self.title_en[:40]}>"

@@ -467,6 +467,62 @@ def application_detail(id):
     return render_template("admin/applications/detail.html", application=app)
 
 
+@admin_bp.route("/applications/<int:id>/cv")
+@admin_required
+def application_cv_download(id):
+    """Force-download CV (PDF/Word) with proper Content-Disposition."""
+    from flask import redirect, abort, current_app
+    from app.utils.media import cloudinary_download_url
+    import requests as http_requests
+
+    app = CareerApplication.query.get_or_404(id)
+    if not app.cv_url:
+        abort(404)
+
+    # Prefer Cloudinary fl_attachment so browser downloads instead of previewing
+    filename = None
+    if app.cv_public_id:
+        # derive extension from public_id or url
+        ext = ""
+        if "." in (app.cv_public_id or ""):
+            ext = app.cv_public_id.rsplit(".", 1)[-1].lower()
+        elif "." in app.cv_url:
+            ext = app.cv_url.rsplit(".", 1)[-1].split("?")[0].lower()
+        if ext in ("pdf", "doc", "docx"):
+            safe_name = (app.full_name or "cv").replace(" ", "_")
+            filename = f"{safe_name}_CV.{ext}"
+
+    dl_url = cloudinary_download_url(app.cv_url, filename=filename)
+
+    # For Cloudinary, redirect with attachment flag is enough and reliable
+    if "cloudinary.com" in (dl_url or ""):
+        return redirect(dl_url)
+
+    # Local / other: stream with attachment headers
+    try:
+        r = http_requests.get(app.cv_url, timeout=30, stream=True)
+        r.raise_for_status()
+        from flask import Response
+        ext = "pdf"
+        if "." in app.cv_url:
+            ext = app.cv_url.rsplit(".", 1)[-1].split("?")[0].lower() or "pdf"
+        safe_name = (app.full_name or "cv").replace(" ", "_")
+        download_name = f"{safe_name}_CV.{ext}"
+        mime = {
+            "pdf": "application/pdf",
+            "doc": "application/msword",
+            "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }.get(ext, "application/octet-stream")
+        headers = {
+            "Content-Type": mime,
+            "Content-Disposition": f'attachment; filename="{download_name}"',
+        }
+        return Response(r.iter_content(chunk_size=8192), headers=headers)
+    except Exception as e:
+        current_app.logger.error(f"CV download failed for application {id}: {e}")
+        return redirect(app.cv_url)
+
+
 # ── Inquiries ──────────────────────────────────────────────────────────
 @admin_bp.route("/inquiries")
 @admin_required
@@ -840,6 +896,87 @@ def faq_delete(id):
     db.session.commit()
     flash("Deleted.", "success")
     return redirect(url_for("admin.faqs"))
+
+
+# ── Notices / Announcements ────────────────────────────────────────────
+@admin_bp.route("/notices", methods=["GET", "POST"])
+@admin_required
+def notices():
+    from app.models import Notice
+    from datetime import datetime
+
+    if request.method == "POST":
+        title_en = request.form.get("title_en", "").strip()
+        if not title_en:
+            flash("Title (EN) is required.", "error")
+            return redirect(url_for("admin.notices"))
+
+        is_active = bool(request.form.get("is_active"))
+        # Only one active notice at a time
+        if is_active:
+            Notice.query.filter_by(is_active=True).update({"is_active": False})
+
+        starts_at = None
+        ends_at = None
+        sa = request.form.get("starts_at", "").strip()
+        ea = request.form.get("ends_at", "").strip()
+        if sa:
+            try:
+                starts_at = datetime.fromisoformat(sa)
+            except ValueError:
+                pass
+        if ea:
+            try:
+                ends_at = datetime.fromisoformat(ea)
+            except ValueError:
+                pass
+
+        n = Notice(
+            title_en=title_en,
+            title_ne=request.form.get("title_ne") or None,
+            body_en=request.form.get("body_en") or None,
+            body_ne=request.form.get("body_ne") or None,
+            link_url=request.form.get("link_url") or None,
+            link_label_en=request.form.get("link_label_en") or None,
+            link_label_ne=request.form.get("link_label_ne") or None,
+            is_active=is_active,
+            starts_at=starts_at,
+            ends_at=ends_at,
+        )
+        db.session.add(n)
+        db.session.commit()
+        flash("Notice created.", "success")
+        return redirect(url_for("admin.notices"))
+
+    items = Notice.query.order_by(Notice.created_at.desc()).all()
+    return render_template("admin/notices.html", items=items)
+
+
+@admin_bp.route("/notices/<int:id>/toggle", methods=["POST"])
+@admin_required
+def notice_toggle(id):
+    from app.models import Notice
+    n = Notice.query.get_or_404(id)
+    if not n.is_active:
+        # Activate this one, deactivate others
+        Notice.query.filter_by(is_active=True).update({"is_active": False})
+        n.is_active = True
+    else:
+        n.is_active = False
+    db.session.commit()
+    flash("Notice status updated.", "success")
+    return redirect(url_for("admin.notices"))
+
+
+@admin_bp.route("/notices/<int:id>/delete", methods=["POST"])
+@admin_required
+def notice_delete(id):
+    from app.models import Notice
+    n = Notice.query.get_or_404(id)
+    db.session.delete(n)
+    db.session.commit()
+    flash("Notice deleted.", "success")
+    return redirect(url_for("admin.notices"))
 
 
 # ── Clients (logo wall) ────────────────────────────────────────────────
